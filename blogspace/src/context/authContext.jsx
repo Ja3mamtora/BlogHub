@@ -1,44 +1,60 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 
 export const AuthContext = createContext();
-const TOKEN_EXPIRY_TIME = 15 * 60 * 1000;
+const TOKEN_EXPIRY_TIME = 15 * 60 * 1000; // 15 minutes
 
 export const AuthProvider = ({ children }) => {
   const [authState, setAuthState] = useState({
     isAuthenticated: false,
     token: null,
+    expiryTime: null,
   });
+
+  const checkTokenExpiration = useCallback(() => {
+    const currentTime = Date.now();
+    if (authState.expiryTime && currentTime > authState.expiryTime) {
+      logout();
+    }
+  }, [authState.expiryTime]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     const expiryTime = localStorage.getItem('expiryTime');
 
-    if (token && expiryTime && Date.now() < expiryTime) {
+    if (token && expiryTime && Date.now() < parseInt(expiryTime, 10)) {
       setAuthState({
         isAuthenticated: true,
-        expiryTime: expiryTime,
-        token: token
+        token: token,
+        expiryTime: parseInt(expiryTime, 10),
       });
+    } else {
+      logout();
     }
   }, []);
 
+  useEffect(() => {
+    const intervalId = setInterval(checkTokenExpiration, 60000); // Check every minute
+    return () => clearInterval(intervalId);
+  }, [checkTokenExpiration]);
+
   const login = (token) => {
-    localStorage.setItem('expiryTime', Date.now() + TOKEN_EXPIRY_TIME);
+    const expiryTime = Date.now() + TOKEN_EXPIRY_TIME;
     localStorage.setItem('token', token);
+    localStorage.setItem('expiryTime', expiryTime.toString());
     setAuthState({
       isAuthenticated: true,
-      expiryTime:Date.now() + TOKEN_EXPIRY_TIME,
-      token: token
+      token: token,
+      expiryTime: expiryTime,
     });
   };
 
   const logout = () => {
-    localStorage.removeItem('username');
     localStorage.removeItem('token');
+    localStorage.removeItem('expiryTime');
     setAuthState({
       isAuthenticated: false,
+      token: null,
       expiryTime: null,
-      token: null
     });
   };
 
@@ -47,4 +63,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}

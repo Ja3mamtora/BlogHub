@@ -3,21 +3,31 @@ import { useNavigate, Navigate } from 'react-router-dom'
 import { AuthContext } from '../context/authContext'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import axios from 'axios'
 
-export default function Component() {
+export default function SignIn() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [signInError, setSignInError] = useState(null)
-  const { authState, setAuthInfo } = useContext(AuthContext)
+  const { authState, login } = useContext(AuthContext)
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    setSignInError(null)
     try {
-      // Simulating API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      toast.success('Signed in successfully!')
-      navigate('/dashboard')
+      const response = await axios.post('https://api.example.com/signin', {
+        email,
+        password
+      })
+      
+      if (response.data && response.data.token) {
+        login(response.data.token)
+        toast.success('Signed in successfully!')
+        navigate('/dashboard')
+      } else {
+        throw new Error('No token received from the server')
+      }
     } catch (error) {
       console.error('Sign in error:', error)
       setSignInError('Failed to sign in. Please check your credentials and try again.')
