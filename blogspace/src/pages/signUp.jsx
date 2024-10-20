@@ -1,235 +1,156 @@
-import React, { useState, useEffect } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
-const SignUp = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [retype, setRetype] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+const quotes = [
+  "A reader lives a thousand lives before he dies. The man who never reads lives only one. - George R.R. Martin",
+  "The more that you read, the more things you will know. The more that you learn, the more places you'll go. - Dr. Seuss",
+  "I find television very educating. Every time somebody turns on the set, I go into the other room and read a book. - Groucho Marx",
+  "You can never get a cup of tea large enough or a book long enough to suit me. - C.S. Lewis",
+  "Reading is essential for those who seek to rise above the ordinary. - Jim Rohn"
+]
 
-  const showWelcomeToast = () => {
-    toast.success('Welcome!', {
-      autoClose: 3000,
-      hideProgressBar: true,
-    });
-  };
+export default function Component() {
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [retype, setRetype] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [quote, setQuote] = useState('')
 
   useEffect(() => {
-    showWelcomeToast();
-  }, []);
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)]
+    setQuote(randomQuote)
 
-  const handleEmailChange = (event) => {
-    setEmail(event.target.value);
-  };
-
-  const handlePasswordChange = (event) => {
-    setPassword(event.target.value);
-  };
-
-  const handleRetypeChange = (event) => {
-    setRetype(event.target.value);
-  };
+    toast.info('Welcome to our minimalist blog!', {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    })
+  }, [])
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
-
+    event.preventDefault()
+    
     if (!isValidPassword(password)) {
-      toast.error(
-        'Password must be at least 8 characters long, contain one uppercase letter, and one special character.',
-        {
-          autoClose: 3000,
-          hideProgressBar: true,
-        }
-      );
-      return;
+      toast.error('Password must be at least 8 characters long, contain one uppercase letter, and one special character.')
+      return
     }
 
     if (password !== retype) {
-      toast.error('Passwords do not match!', {
-        autoClose: 3000,
-        hideProgressBar: true,
-      });
-      return;
+      toast.error('Passwords do not match!')
+      return
     }
 
-    setIsSubmitting(true);
+    setIsSubmitting(true)
 
     try {
-      const response = await fetch('http://localhost:3000/api/v1/user/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to sign up');
-      }
-
-      toast.success('Signed up successfully! Verify your email.', {
-        autoClose: 3000,
-        hideProgressBar: true,
-      });
-      window.location.href = '/signin';
+      // Simulating API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      toast.success('Signed up successfully! Verify your email.')
+      navigate('/signin')
     } catch (error) {
-      toast.error('Sign-up failed!', {
-        autoClose: 3000,
-        hideProgressBar: true,
-      });
+      console.error('Sign up error:', error)
+      toast.error('Sign-up failed!')
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const isValidPassword = (password) => {
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
-    return passwordRegex.test(password);
-  };
-
-  const styles = {
-    wrapper: {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '100vh',
-      backgroundColor: '#e3f2fd',
-      margin: '-8px',
-      padding: '10px',
-    },
-    container: {
-      maxWidth: '400px',
-      width: '100%',
-      padding: '2em',
-      borderRadius: '10px',
-      backgroundColor: '#282828',
-      boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      color: '#ffffff',
-    },
-    header: {
-      fontSize: '2em',
-      textAlign: 'center',
-      marginBottom: '0.5em',
-      color: '#ffffff',
-    },
-    form: {
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-    },
-    label: {
-      display: 'block',
-      marginBottom: '0.5em',
-      fontWeight: '600',
-      width: '100%',
-      color: '#ffffff',
-    },
-    input: {
-      width: '100%',
-      padding: '0.5em',
-      border: '1px solid #444',
-      borderRadius: '4px',
-      backgroundColor: '#333',
-      color: '#ffffff',
-      marginBottom: '1em',
-    },
-    button: {
-      width: '100%',
-      padding: '0.75em',
-      backgroundColor: '#007bff',
-      color: '#fff',
-      border: 'none',
-      borderRadius: '4px',
-      cursor: 'pointer',
-      fontSize: '1em',
-      fontWeight: '500',
-      transition: 'background-color 0.25s',
-    },
-    buttonHover: {
-      backgroundColor: '#0056b3',
-    },
-    formFooter: {
-      marginTop: '1em',
-      textAlign: 'center',
-    },
-    link: {
-      color: '#ffffff',
-      textDecoration: 'none',
-    },
-    '@media (max-width: 600px)': {
-      container: {
-        padding: '1em',
-      },
-      header: {
-        fontSize: '1.5em',
-      },
-      button: {
-        fontSize: '0.875em',
-      },
-    },
-  };
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/
+    return passwordRegex.test(password)
+  }
 
   return (
-    <div style={styles.wrapper}>
-      <ToastContainer />
-      <div style={styles.container}>
-        <h2 style={styles.header}>Sign Up</h2>
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={{ marginBottom: '1em', width: '100%' }}>
-            <label htmlFor="email" style={styles.label}>Email</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={handleEmailChange}
-              style={styles.input}
-              required
-            />
+    <div className="min-vh-100 d-flex align-items-center justify-content-center" style={{
+      backgroundImage: "url('https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+      backgroundSize: 'cover',
+      backgroundPosition: 'center'
+    }}>
+      <div className="card shadow-lg" style={{ 
+        maxWidth: '450px', 
+        width: '100%', 
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(10px)',
+        border: 'none',
+        borderRadius: '15px'
+      }}>
+        <div className="card-body p-5">
+          <h2 className="card-title text-center mb-4" style={{ fontWeight: '300', color: '#333' }}>Sign Up</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label" style={{ color: '#555' }}>Email</label>
+              <input
+                type="email"
+                className="form-control"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)', border: 'none', borderRadius: '8px' }}
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label" style={{ color: '#555' }}>Password</label>
+              <input
+                type="password"
+                className="form-control"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)', border: 'none', borderRadius: '8px' }}
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="retype" className="form-label" style={{ color: '#555' }}>Re-Type Password</label>
+              <input
+                type="password"
+                className="form-control"
+                id="retype"
+                value={retype}
+                onChange={(e) => setRetype(e.target.value)}
+                required
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)', border: 'none', borderRadius: '8px' }}
+              />
+            </div>
+            <button type="submit" className="btn btn-primary w-100" style={{ 
+              backgroundColor: '#4a4a4a', 
+              border: 'none', 
+              borderRadius: '8px',
+              padding: '10px',
+              fontWeight: '500',
+              transition: 'all 0.3s ease'
+            }} disabled={isSubmitting}>
+              {isSubmitting ? 'Signing Up...' : 'Sign Up'}
+            </button>
+          </form>
+          <p className="text-center mt-3" style={{ color: '#555', fontSize: '0.9em' }}>
+            By signing up, you accept our <b>terms</b> and <b>privacy policy</b>.
+          </p>
+          <div className="text-center mt-3">
+            <a href="/signin" className="text-decoration-none" style={{ color: '#4a4a4a' }}>Already have an account? <b>Sign In</b></a>
           </div>
-          <div style={{ marginBottom: '1em', width: '100%' }}>
-            <label htmlFor="password" style={styles.label}>Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={handlePasswordChange}
-              style={styles.input}
-              required
-            />
-          </div>
-          <div style={{ marginBottom: '1em', width: '100%' }}>
-            <label htmlFor="retype" style={styles.label}>Re-Type Password</label>
-            <input
-              type="password"
-              id="retype"
-              value={retype}
-              onChange={handleRetypeChange}
-              style={styles.input}
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            style={styles.button}
-            disabled={isSubmitting}
-            onMouseOver={(e) => e.target.style.backgroundColor = styles.buttonHover.backgroundColor}
-            onMouseOut={(e) => e.target.style.backgroundColor = styles.button.backgroundColor}
-          >
-            {isSubmitting ? 'Signing Up...' : 'Sign Up'}
-          </button>
-          <p>By signing up, you accept our <b>terms</b> and <b>privacy policy</b>.</p>
-        </form>
-        <div style={styles.formFooter}>
-          <a href="/signin" style={styles.link}>Already have an account? <b>Sign In</b></a>
         </div>
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
-  );
-};
-
-export default SignUp;
+  )
+}

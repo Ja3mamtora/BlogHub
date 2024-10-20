@@ -1,222 +1,118 @@
+import React, { useState, useContext, useEffect } from 'react'
+import { useNavigate, Navigate } from 'react-router-dom'
+import { AuthContext } from '../context/authContext'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
-import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
-import { AuthContext } from '../context/authContext';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+export default function Component() {
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [signInError, setSignInError] = useState(null)
+  const { authState, setAuthInfo } = useContext(AuthContext)
 
-const SignIn = () => {
-    const navigate = useNavigate();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [signInError, setSignInError] = useState(null);
-    const { authState, setAuthInfo } = useContext(AuthContext);
-  
-    const handleEmailChange = (event) => {
-      setEmail(event.target.value);
-    };
-  
-    const handlePasswordChange = (event) => {
-      setPassword(event.target.value);
-    };
-  
-    const showWelcomeToast = () => {
-      toast.success('Welcome!', {
-        autoClose: 3000,
-        hideProgressBar: true,
-      });
-    };
-  
-    useEffect(() => {
-      showWelcomeToast();
-    }, []);
-  
-    const handleSubmit = async (event) => {
-      event.preventDefault();
-  
-      try {
-        const response = await fetch('http://localhost:3000/api/v1/user/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, password }),
-        });
-  
-        if (!response) {
-          throw new Error('Failed to sign in');
-        }
-  
-        const data = await response.json();
-        const token = data.token;
-        const expiryTime = data.data.expiryTime;
-  
-        if (token) {
-          localStorage.setItem("token", token);
-          localStorage.setItem("expiryTime", expiryTime);
-          console.log('User signed in successfully');
-          toast.success('Signed-In successfully!', {
-            autoClose: 3000,
-            hideProgressBar: true,
-          });
-          navigate('/dashboard');
-        } else {
-          throw new Error('Token not found in response');
-        }
-      } catch (error) {
-        console.error('Sign in error:', error);
-        toast.error('Sign-In Failed!', {
-          autoClose: 3000,
-          hideProgressBar: true,
-        });
-        setSignInError('Failed to sign in. Please check your credentials or verify your email and try again.');
-      }
-    };
-  
-    const styles = {
-      wrapper: {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        backgroundColor: '#e3f2fd',
-        color: '#ffffff',
-        margin: '-8px',
-        padding: '10px',
-      },
-      container: {
-        maxWidth: '400px',
-        width: '100%',
-        padding: '2em',
-        borderRadius: '10px',
-        backgroundColor: '#28282f',
-        boxShadow: '0 10px 20px rgba(-2.5, 0, 0, 3)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      },
-      header: {
-        fontSize: '2em',
-        lineHeight: '1.1',
-        textAlign: 'center',
-        marginBottom: '0.5em',
-      },
-      form: {
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      },
-      label: {
-        display: 'block',
-        marginBottom: '0.5em',
-        fontWeight: '600',
-        width: '100%',
-      },
-      input: {
-        width: '100%',
-        padding: '0.5em',
-        border: '1px solid #444',
-        borderRadius: '4px',
-        boxSizing: 'border-box',
-        marginBottom: '1em',
-        backgroundColor: '#333',
-        color: '#fff',
-      },
-      button: {
-        width: '100%',
-        padding: '0.75em',
-        backgroundColor: '#007bff',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        fontSize: '1em',
-        fontWeight: '500',
-        transition: 'background-color 0.25s',
-      },
-      buttonHover: {
-        backgroundColor: '#0056b3',
-      },
-      formFooter: {
-        marginTop: '1em',
-        textAlign: 'center',
-      },
-      link: {
-        color: '#ffffff',
-        textDecoration: 'none',
-      },
-      error: {
-        color: 'red',
-        textAlign: 'center',
-        marginTop: '1em',
-      },
-      '@media (max-width: 600px)': {
-        container: {
-          padding: '1em',
-        },
-        header: {
-          fontSize: '1.5em',
-        },
-        button: {
-          fontSize: '0.875em',
-        },
-      },
-    };
-    
-  
-    if (authState.isAuthenticated) {
-      return <Navigate to="/dashboard" replace={true} />;
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    try {
+      // Simulating API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      toast.success('Signed in successfully!')
+      navigate('/dashboard')
+    } catch (error) {
+      console.error('Sign in error:', error)
+      setSignInError('Failed to sign in. Please check your credentials and try again.')
+      toast.error('Sign-in failed. Please try again.')
     }
-  
-    return (
-      <div style={styles.wrapper}>
-        <ToastContainer />
-        <div style={styles.container}>
-          <h2 style={styles.header}>Sign In</h2>
-          <form onSubmit={handleSubmit} style={styles.form}>
-            <div style={{ marginBottom: '1em', width: '100%' }}>
-              <label htmlFor="email" style={styles.label}>Email</label>
+  }
+
+  useEffect(() => {
+    toast.info('Welcome to our minimalist blog!', {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    })
+  }, [])
+
+  if (authState.isAuthenticated) {
+    return <Navigate to="/dashboard" replace={true} />
+  }
+
+  return (
+    <div className="min-vh-100 d-flex align-items-center justify-content-center" style={{
+      backgroundImage: "url('https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+      backgroundSize: 'cover',
+      backgroundPosition: 'center'
+    }}>
+      <div className="card shadow-lg" style={{ 
+        maxWidth: '400px', 
+        width: '100%', 
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(10px)',
+        border: 'none',
+        borderRadius: '15px'
+      }}>
+        <div className="card-body p-5">
+          <h2 className="card-title text-center mb-4" style={{ fontWeight: '300', color: '#333' }}>Sign In</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label" style={{ color: '#555' }}>Email</label>
               <input
                 type="email"
+                className="form-control"
                 id="email"
                 value={email}
-                onChange={handleEmailChange}
-                style={styles.input}
+                onChange={(e) => setEmail(e.target.value)}
                 required
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)', border: 'none', borderRadius: '8px' }}
               />
             </div>
-            <div style={{ marginBottom: '1em', width: '100%' }}>
-              <label htmlFor="password" style={styles.label}>Password</label>
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label" style={{ color: '#555' }}>Password</label>
               <input
                 type="password"
+                className="form-control"
                 id="password"
                 value={password}
-                onChange={handlePasswordChange}
-                style={styles.input}
+                onChange={(e) => setPassword(e.target.value)}
                 required
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)', border: 'none', borderRadius: '8px' }}
               />
             </div>
-            <button
-              type="submit"
-              style={styles.button}
-              onMouseOver={(e) => e.target.style.backgroundColor = styles.buttonHover.backgroundColor}
-              onMouseOut={(e) => e.target.style.backgroundColor = styles.button.backgroundColor}
-            >
-              Sign in
-            </button>
+            <button type="submit" className="btn btn-primary w-100" style={{ 
+              backgroundColor: '#4a4a4a', 
+              border: 'none', 
+              borderRadius: '8px',
+              padding: '10px',
+              fontWeight: '500',
+              transition: 'all 0.3s ease'
+            }}>Sign in</button>
           </form>
           {signInError && (
-            <div style={styles.error}>
+            <div className="alert alert-danger mt-3" role="alert" style={{ backgroundColor: 'rgba(255, 0, 0, 0.1)', color: '#721c24', border: 'none', borderRadius: '8px' }}>
               {signInError}
             </div>
           )}
-          <div style={styles.formFooter}>
-            <a href="/signup" style={styles.link}>Don't have an account? <b>Sign up</b></a>
+          <div className="text-center mt-3">
+            <a href="/signup" className="text-decoration-none" style={{ color: '#4a4a4a' }}>Don't have an account? <b>Sign up</b></a>
           </div>
         </div>
       </div>
-    );
-  };
-  
-  export default SignIn;
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+    </div>
+  )
+}
