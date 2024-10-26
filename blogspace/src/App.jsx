@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-d
 import SignIn from "./pages/signIn";
 import SignUp from "./pages/signUp";
 import Dashboard from './pages/dashboard';
+import Verify from './pages/verify';
+
 import { AuthProvider } from './context/authContext';
 import { useAuth } from './hooks/useAuth';
 
@@ -24,6 +26,8 @@ function App() {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/verify/:token" element={<Verify />} />
+
           <Route 
             path="/dashboard" 
             element={
