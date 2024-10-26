@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { HomeIcon, ListIcon, FlameIcon, BuildingIcon, UserIcon, ArrowUpIcon, BookmarkIcon, SearchIcon, XIcon, ZapIcon, FilterIcon, PlusIcon, SunIcon, MoonIcon } from 'lucide-react'
+import { HomeIcon, ListIcon, FlameIcon, BuildingIcon, UserIcon, ArrowUpIcon, BookmarkIcon, SearchIcon, XIcon, ZapIcon, FilterIcon, PlusIcon, SunIcon, MoonIcon, ChevronDownIcon } from 'lucide-react'
 import { Toaster, toast } from 'react-hot-toast'
 
 const companies = [
@@ -117,6 +117,8 @@ export default function Dashboard() {
   const [bookmarkLists, setBookmarkLists] = useState(['Favorites', 'Read Later'])
   const [newListName, setNewListName] = useState('')
   const [theme, setTheme] = useState('light')
+  const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const [showMyListsModal, setShowMyListsModal] = useState(false)
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') || 'light'
@@ -125,7 +127,7 @@ export default function Dashboard() {
   }, [])
 
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light'
+    const newTheme = theme === 'dark' ? 'light' : 'dark'
     setTheme(newTheme)
     localStorage.setItem('theme', newTheme)
     document.documentElement.classList.toggle('dark', newTheme === 'dark')
@@ -199,7 +201,13 @@ export default function Dashboard() {
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:items-center">
               <NavItem icon={<HomeIcon className="h-5 w-5" />} text="Home" active={activeSection === 'Home'} onClick={() => setActiveSection('Home')} theme={theme} />
-              <NavItem icon={<ListIcon className="h-5 w-5" />} text="List" active={activeSection === 'List'} onClick={() => setActiveSection('List')} theme={theme} />
+              <NavItem 
+                icon={<ListIcon className="h-5 w-5" />} 
+                text="List" active={activeSection === 'List'} 
+                onClick={() => {
+                  setShowMyListsModal(true);
+                }}
+                theme={theme} />
               <NavItem icon={<FlameIcon className="h-5 w-5" />} text="Trending" active={activeSection === 'Trending'} onClick={() => setActiveSection('Trending')} theme={theme} />
               <NavItem
                 icon={<BuildingIcon className="h-5 w-5" />}
@@ -211,7 +219,66 @@ export default function Dashboard() {
                 }}
                 theme={theme}
               />
-              <NavItem icon={<UserIcon className="h-5 w-5" />} text="Profile" active={activeSection === 'Profile'} onClick={() => setActiveSection('Profile')} theme={theme} />
+                <div className="relative">
+                <button
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium ${
+                    theme === 'dark' ? 'text-gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+                >
+                  <UserIcon className="h-5 w-5 mr-2" />
+                  Profile
+                  <ChevronDownIcon className="ml-1 h-4 w-4" />
+                </button>
+                {showProfileMenu && (
+                  <div
+                    className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 ${
+                      theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+                    } ring-1 ring-black ring-opacity-5 z-50`} // Add z-50 here
+                    role="menu"
+                  >
+                    <a
+                      href="#"
+                      className={`block px-4 py-2 text-sm ${
+                        theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                      role="menuitem"
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        setShowMyListsModal(true);
+                      }}
+                    >
+                      My Lists
+                    </a>
+                    <a
+                      href="#"
+                      className={`block px-4 py-2 text-sm ${
+                        theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                      role="menuitem"
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        // Add logic to navigate to Edit Profile page
+                      }}
+                    >
+                      Edit Profile
+                    </a>
+                    <a
+                      href="#"
+                      className={`block px-4 py-2 text-sm ${
+                        theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                      role="menuitem"
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        // Add logic for signing out
+                      }}
+                    >
+                      Sign Out
+                    </a>
+                  </div>
+                )}
+              </div>
               <button
                 onClick={toggleTheme}
                 className={`ml-4 p-2 rounded-full ${theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-gray-200 text-gray-600'}`}
@@ -291,7 +358,7 @@ export default function Dashboard() {
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className={`w-full pl-10 pr-4 py-2 border ${
-                  theme === 'dark' ? 'border-gray-700 bg-gray-800 text-white' :    'border-gray-300 bg-white text-black'
+                  theme === 'dark' ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'
                 } rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none`}
               >
                 {categories.map((category) => (
@@ -549,33 +616,82 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* My Lists modal */}
+      {showMyListsModal && (
+        <div className="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div className="flex items-center justify-center min-h-screen p-4 text-center sm:block sm:p-0">
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-50 transition-opacity" aria-hidden="true"></div>
+          <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+          <div className={`inline-block align-middle rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
+              <div className={`px-4 pt-5 pb-4 sm:p-6 sm:pb-4 ${
+                theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+              }`}>
+                <div className="sm:flex sm:items-start">
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                    <h3 className={`text-lg leading-6 font-medium ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`} id="modal-title">
+                      My Lists
+                    </h3>
+                    <div className="mt-4 space-y-2">
+                      {bookmarkLists.map((list) => (
+                        <div
+                          key={list}
+                          className={`px-4 py-2 rounded-md text-sm font-medium ${
+                            theme === 'dark'
+                              ? 'bg-gray-700 text-gray-300'
+                              : 'bg-gray-100 text-gray-700'
+                          }`}
+                        >
+                          {list}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={`px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse ${
+                theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+              }`}>
+                <button
+                  type="button"
+                  className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 ${
+                    theme === 'dark'
+                      ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                      : 'bg-purple-600 text-white hover:bg-purple-700'
+                  } text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:ml-3 sm:w-auto sm:text-sm`}
+                  onClick={() => setShowMyListsModal(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
-const NavItem = ({ icon, text, onClick, mobile, active, theme }) => (
-  <a
-    href="#"
-    className={`${
-      mobile
-        ? 'block px-3 py-2 rounded-md text-base font-medium'
-        : 'px-3 py-2 rounded-md text-sm font-medium'
-    } ${
+const NavItem = ({ href, icon, text, active, onClick, mobile, theme }) => (
+  <button
+    onClick={onClick}
+    className={`${mobile ? 'block w-full text-left' : 'inline-flex items-center'} px-3 py-2 rounded-md text-sm font-medium ${
       active
         ? theme === 'dark'
           ? 'bg-gray-900 text-white'
-          : '  bg-purple-100 text-purple-900'
+          : 'bg-gray-100 text-gray-900'
         : theme === 'dark'
         ? 'text-gray-300 hover:bg-gray-700 hover:text-white'
         : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
     }`}
-    onClick={onClick}
   >
-    <span className="flex items-center">
-      {React.cloneElement(icon, { className: `${icon.props.className} ${active ? theme === 'dark' ? 'text-white' : 'text-purple-600' : ''}` })}
-      <span className={`ml-2 ${active ? theme === 'dark' ? 'text-white' : 'text-purple-900' : ''}`}>{text}</span>
-    </span>
-  </a>
+    {React.cloneElement(icon, { className: `${icon.props.className} ${mobile ? 'mr-3' : 'mr-1.5'}` })}
+    {text}
+  </button>
 )
 
 const BlogCard = ({ blog, toggleUpvote, toggleSave, theme }) => (
