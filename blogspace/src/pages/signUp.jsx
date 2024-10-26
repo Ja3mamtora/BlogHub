@@ -2,27 +2,17 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { Mail, Lock, RefreshCw } from 'lucide-react'
 
-const quotes = [
-  "A reader lives a thousand lives before he dies. The man who never reads lives only one. - George R.R. Martin",
-  "The more that you read, the more things you will know. The more that you learn, the more places you'll go. - Dr. Seuss",
-  "I find television very educating. Every time somebody turns on the set, I go into the other room and read a book. - Groucho Marx",
-  "You can never get a cup of tea large enough or a book long enough to suit me. - C.S. Lewis",
-  "Reading is essential for those who seek to rise above the ordinary. - Jim Rohn"
-]
-
-export default function Component() {
+export default function SignUp() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [retype, setRetype] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [quote, setQuote] = useState('')
+
 
   useEffect(() => {
-    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)]
-    setQuote(randomQuote)
-
     toast.info('Welcome to our minimalist blog!', {
       position: "top-right",
       autoClose: 3000,
@@ -68,75 +58,81 @@ export default function Component() {
   }
 
   return (
-    <div className="min-vh-100 d-flex align-items-center justify-content-center" style={{
-      backgroundImage: "url('https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
-      backgroundSize: 'cover',
-      backgroundPosition: 'center'
+    <div className="min-h-screen flex items-center justify-center bg-cover bg-center" style={{
+      backgroundImage: "url('https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"
     }}>
-      <div className="card shadow-lg" style={{ 
-        maxWidth: '450px', 
-        width: '100%', 
-        backgroundColor: 'rgba(255, 255, 255, 0.8)',
-        backdropFilter: 'blur(10px)',
-        border: 'none',
-        borderRadius: '15px'
-      }}>
-        <div className="card-body p-5">
-          <h2 className="card-title text-center mb-4" style={{ fontWeight: '300', color: '#333' }}>Sign Up</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label htmlFor="email" className="form-label" style={{ color: '#555' }}>Email</label>
+      <div className="bg-white bg-opacity-80 backdrop-blur-md p-8 rounded-2xl shadow-lg max-w-md w-full">
+        <div className="flex items-center justify-center mb-6">
+          <img src="\BlogSpace.png" alt="BlogSpace Logo" className="h-20 w-20 mr-2" />
+          <h2 className="text-3xl font-light text-gray-800"></h2>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+            <div className="mt-1 relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Mail className="h-5 w-5 text-gray-400" />
+              </div>
               <input
                 type="email"
-                className="form-control"
                 id="email"
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white bg-opacity-50 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)', border: 'none', borderRadius: '8px' }}
               />
             </div>
-            <div className="mb-3">
-              <label htmlFor="password" className="form-label" style={{ color: '#555' }}>Password</label>
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+            <div className="mt-1 relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-gray-400" />
+              </div>
               <input
                 type="password"
-                className="form-control"
                 id="password"
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white bg-opacity-50 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)', border: 'none', borderRadius: '8px' }}
               />
             </div>
-            <div className="mb-3">
-              <label htmlFor="retype" className="form-label" style={{ color: '#555' }}>Re-Type Password</label>
+          </div>
+          <div>
+            <label htmlFor="retype" className="block text-sm font-medium text-gray-700">Re-Type Password</label>
+            <div className="mt-1 relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <RefreshCw className="h-5 w-5 text-gray-400" />
+              </div>
               <input
                 type="password"
-                className="form-control"
                 id="retype"
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white bg-opacity-50 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                placeholder="••••••••"
                 value={retype}
                 onChange={(e) => setRetype(e.target.value)}
                 required
-                style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)', border: 'none', borderRadius: '8px' }}
               />
             </div>
-            <button type="submit" className="btn btn-primary w-100" style={{ 
-              backgroundColor: '#4a4a4a', 
-              border: 'none', 
-              borderRadius: '8px',
-              padding: '10px',
-              fontWeight: '500',
-              transition: 'all 0.3s ease'
-            }} disabled={isSubmitting}>
-              {isSubmitting ? 'Signing Up...' : 'Sign Up'}
-            </button>
-          </form>
-          <p className="text-center mt-3" style={{ color: '#555', fontSize: '0.9em' }}>
-            By signing up, you accept our <b>terms</b> and <b>privacy policy</b>.
-          </p>
-          <div className="text-center mt-3">
-            <a href="/signin" className="text-decoration-none" style={{ color: '#4a4a4a' }}>Already have an account? <b>Sign In</b></a>
           </div>
+          <button
+            type="submit"
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150 ease-in-out"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Signing Up...' : 'Sign Up'}
+          </button>
+        </form>
+        <p className="mt-4 text-center text-sm text-gray-600">
+          By signing up, you accept our <a href="#" className="font-medium text-purple-600 hover:text-purple-500">terms</a> and <a href="#" className="font-medium text-purple-600 hover:text-purple-500">privacy policy</a>.
+        </p>
+        <div className="mt-6 text-center">
+          <a href="/signin" className="text-sm font-medium">
+            Already have an account? <span className="font-bold text-purple-600 hover:text-purple-500">Sign In</span>
+          </a>
         </div>
       </div>
       <ToastContainer
