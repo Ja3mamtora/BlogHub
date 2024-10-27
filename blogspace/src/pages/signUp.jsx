@@ -40,15 +40,29 @@ export default function SignUp() {
     setIsSubmitting(true)
 
     try {
-      // Simulating API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      toast.success('Signed up successfully! Verify your email.')
-      navigate('/signin')
+      setIsSubmitting(true);    
+      // API call with POST request
+      const response = await fetch('http://localhost:3030/api/v1/user/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      console.log(response.ok);
+      if (response.ok) {
+        toast.success('Signed up successfully! Verify your email.');
+        navigate('/signin');
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || 'Sign-up failed!');
+      }
     } catch (error) {
-      console.error('Sign up error:', error)
-      toast.error('Sign-up failed!')
+      console.error('Sign up error:', error);
+      toast.error('Sign-up failed!');
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 

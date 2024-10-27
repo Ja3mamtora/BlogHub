@@ -17,20 +17,23 @@ export default function SignIn() {
     event.preventDefault()
     setSignInError(null)
     try {
-      const response = await axios.post('https://api.example.com/signin', {
-        email,
-        password
-      })
-      
-      if (response.data && response.data.token) {
-        login(response.data.token)
+      console.log(email + "" + password);
+      const response = await fetch('http://localhost:3030/api/v1/user/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await response.json();
+      if (data && data.token) {
+        login(data.token)
         toast.success('Signed in successfully!')
         navigate('/dashboard')
       } else {
         throw new Error('No token received from the server')
       }
     } catch (error) {
-      console.error('Sign in error:', error)
       setSignInError('Failed to sign in. Please check your credentials and try again.')
       toast.error('Sign-in failed. Please try again.')
     }

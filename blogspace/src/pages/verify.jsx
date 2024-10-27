@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 
 export default function Verify() {
   const { token } = useParams();
@@ -16,9 +17,9 @@ export default function Verify() {
       }
 
       try {
-        const response = true; // Mocked response for testing
-
-        if (response) {
+        const response = await axios.get(`http://localhost:3030/api/v1/user/verify/${token}`);
+      
+        if (response.status === 200) {
           setVerificationStatus('success');
           setMessage('User verified successfully!');
         } else {
@@ -26,6 +27,7 @@ export default function Verify() {
           setMessage('Verification failed. Please try again or contact support.');
         }
       } catch (error) {
+        console.log(error);
         setVerificationStatus('error');
         setMessage('An error occurred during verification. Please try again later.');
       }
