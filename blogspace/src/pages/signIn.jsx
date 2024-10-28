@@ -44,9 +44,9 @@ export default function SignIn() {
   }
 
   useEffect(() => {
-    toast.info('Welcome to our minimalist blog!', {
+    toast.success('Welcome to BlogSpace!', {
       position: "top-right",
-      autoClose: 3000,
+      autoClose: 1500,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,

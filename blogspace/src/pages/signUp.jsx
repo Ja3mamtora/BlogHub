@@ -14,9 +14,9 @@ export default function SignUp() {
 
 
   useEffect(() => {
-    toast.info('Welcome to our minimalist blog!', {
+    toast.success('Welcome to BlogSpace!', {
       position: "top-right",
-      autoClose: 3000,
+      autoClose: 1500,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
@@ -42,7 +42,6 @@ export default function SignUp() {
 
     try {
       setIsSubmitting(true);    
-      // API call with POST request
       const response = await fetch('http://localhost:3030/api/v1/user/register', {
         method: 'POST',
         headers: {
