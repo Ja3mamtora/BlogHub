@@ -1,7 +1,5 @@
-'use client'
-
-import React, { useState, useEffect } from 'react'
-import { HomeIcon, ListIcon, FlameIcon, BuildingIcon, UserIcon, ArrowUpIcon, BookmarkIcon, SearchIcon, XIcon, ZapIcon, FilterIcon, PlusIcon, SunIcon, MoonIcon, ChevronDownIcon } from 'lucide-react'
+import React, { useState, useEffect, useMemo } from 'react'
+import { HomeIcon, ListIcon, FlameIcon, BuildingIcon, ArrowUpIcon, BookmarkIcon, SearchIcon, XIcon, ZapIcon, FilterIcon, PlusIcon, SunIcon, MoonIcon, LogOutIcon } from 'lucide-react'
 import { Toaster, toast } from 'react-hot-toast'
 
 const companies = [
@@ -117,8 +115,8 @@ export default function Dashboard() {
   const [bookmarkLists, setBookmarkLists] = useState(['Favorites', 'Read Later'])
   const [newListName, setNewListName] = useState('')
   const [theme, setTheme] = useState('light')
-  const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [showMyListsModal, setShowMyListsModal] = useState(false)
+  const [selectedCompany, setSelectedCompany] = useState(null)
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') || 'light'
@@ -132,6 +130,17 @@ export default function Dashboard() {
     localStorage.setItem('theme', newTheme)
     document.documentElement.classList.toggle('dark', newTheme === 'dark')
   }
+
+  const groupedCompanies = useMemo(() => {
+    return companies.sort().reduce((acc, company) => {
+      const initial = company[0].toUpperCase()
+      if (!acc[initial]) {
+        acc[initial] = []
+      }
+      acc[initial].push(company)
+      return acc
+    }, {})
+  }, [companies])
 
   const blogsPerPage = 8
   const indexOfLastBlog = currentPage * blogsPerPage
@@ -191,153 +200,116 @@ export default function Dashboard() {
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-black'}`}>
-      <Toaster position="bottom-center" />
-      {/* Navbar */}
-      <nav className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-md`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text">BlogSpace</span>
-            </div>
-            <div className="hidden sm:ml-6 sm:flex sm:items-center">
-              <NavItem icon={<HomeIcon className="h-5 w-5" />} text="Home" active={activeSection === 'Home'} onClick={() => setActiveSection('Home')} theme={theme} />
-              <NavItem 
-                icon={<ListIcon className="h-5 w-5" />} 
-                text="List" active={activeSection === 'List'} 
-                onClick={() => {
-                  setShowMyListsModal(true);
-                }}
-                theme={theme} />
-              <NavItem icon={<FlameIcon className="h-5 w-5" />} text="Trending" active={activeSection === 'Trending'} onClick={() => setActiveSection('Trending')} theme={theme} />
-              <NavItem
-                icon={<BuildingIcon className="h-5 w-5" />}
-                text="Companies"
-                active={activeSection === 'Companies'}
-                onClick={() => {
-                  setShowCompanies(true)
-                  setActiveSection('Companies')
-                }}
-                theme={theme}
-              />
-                <div className="relative">
-                <button
-                  onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium ${
-                    theme === 'dark' ? 'text-gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                >
-                  <UserIcon className="h-5 w-5 mr-2" />
-                  Profile
-                  <ChevronDownIcon className="ml-1 h-4 w-4" />
-                </button>
-                {showProfileMenu && (
-                  <div
-                    className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 ${
-                      theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-                    } ring-1 ring-black ring-opacity-5 z-50`} // Add z-50 here
-                    role="menu"
-                  >
-                    <a
-                      href="#"
-                      className={`block px-4 py-2 text-sm ${
-                        theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
-                      }`}
-                      role="menuitem"
-                      onClick={() => {
-                        setShowProfileMenu(false);
-                        setShowMyListsModal(true);
-                      }}
-                    >
-                      My Lists
-                    </a>
-                    <a
-                      href="#"
-                      className={`block px-4 py-2 text-sm ${
-                        theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
-                      }`}
-                      role="menuitem"
-                      onClick={() => {
-                        setShowProfileMenu(false);
-                        // Add logic to navigate to Edit Profile page
-                      }}
-                    >
-                      Edit Profile
-                    </a>
-                    <a
-                      href="#"
-                      className={`block px-4 py-2 text-sm ${
-                        theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
-                      }`}
-                      role="menuitem"
-                      onClick={() => {
-                        setShowProfileMenu(false);
-                        // Add logic for signing out
-                      }}
-                    >
-                      Sign Out
-                    </a>
-                  </div>
-                )}
-              </div>
-              <button
-                onClick={toggleTheme}
-                className={`ml-4 p-2 rounded-full ${theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-gray-200 text-gray-600'}`}
-              >
-                {theme === 'dark' ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
-              </button>
-            </div>
-            <div className="flex items-center sm:hidden">
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`inline-flex items-center justify-center p-2 rounded-md ${
-                  theme === 'dark' ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' : 'text-gray-400 hover:text-gray-500 hover:bg-gray-100'
-                } focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500`}
-              >
-                {mobileMenuOpen ? (
-                  <XIcon className="block h-6 w-6" />
-                ) : (
-                  <ListIcon className="block h-6 w-6" />
-                )}
-              </button>
-            </div>
+    <Toaster position="bottom-center" />
+    {/* Navbar */}
+    <nav className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-md fixed top-0 left-0 right-0 z-50`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex-shrink-0 flex items-center">
+            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text">BlogSpace</span>
           </div>
-        </div>
-      </nav>
-
-      {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <div className={`sm:hidden ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
-          <div className="pt-2 pb-3 space-y-1">
-            <NavItem icon={<HomeIcon className="h-5 w-5" />} text="Home" mobile active={activeSection === 'Home'} onClick={() => { setActiveSection('Home'); setMobileMenuOpen(false); }} theme={theme} />
-            <NavItem icon={<ListIcon className="h-5 w-5" />} text="List" mobile active={activeSection === 'List'} onClick={() => { setActiveSection('List'); setMobileMenuOpen(false); }} theme={theme} />
-            <NavItem icon={<FlameIcon className="h-5 w-5" />} text="Trending" mobile active={activeSection === 'Trending'} onClick={() => { setActiveSection('Trending'); setMobileMenuOpen(false); }} theme={theme} />
+          <div className="hidden sm:ml-6 sm:flex sm:items-center">
+            <NavItem icon={<HomeIcon className="h-5 w-5" />} text="Home" active={activeSection === 'Home'} onClick={() => setActiveSection('Home')} theme={theme} />
+            <NavItem 
+              icon={<ListIcon className="h-5 w-5" />} 
+              text="List" 
+              active={activeSection === 'List'} 
+              onClick={() => {
+                setShowMyListsModal(true);
+              }}
+              theme={theme} 
+            />
+            <NavItem icon={<FlameIcon className="h-5 w-5" />} text="Trending" active={activeSection === 'Trending'} onClick={() => setActiveSection('Trending')} theme={theme} />
             <NavItem
               icon={<BuildingIcon className="h-5 w-5" />}
               text="Companies"
-              mobile
               active={activeSection === 'Companies'}
               onClick={() => {
                 setShowCompanies(true)
                 setActiveSection('Companies')
-                setMobileMenuOpen(false)
               }}
               theme={theme}
             />
-            <NavItem icon={<UserIcon className="h-5 w-5" />} text="Profile" mobile active={activeSection === 'Profile'} onClick={() => { setActiveSection('Profile'); setMobileMenuOpen(false); }} theme={theme} />
             <button
-              onClick={toggleTheme}
-              className={`w-full text-left px-3 py-2 rounded-md text-base font-medium ${
-                theme === 'dark' ? 'text-gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+              onClick={() => {
+                // Add logic for signing out
+              }}
+              className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                theme === 'dark' 
+                  ? 'text-gray-300 hover:bg-gray-700 hover:text-white' 
+                  : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+              <LogOutIcon className="h-5 w-5 mr-2" />
+              Sign Out
+            </button>
+            <button
+              onClick={toggleTheme}
+              className={`ml-4 p-2 rounded-full ${theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-gray-200 text-gray-600'}`}
+            >
+              {theme === 'dark' ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
+            </button>
+          </div>
+          <div className="flex items-center sm:hidden">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className={`inline-flex items-center justify-center p-2 rounded-md ${
+                theme === 'dark' ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' : 'text-gray-400 hover:text-gray-500 hover:bg-gray-100'
+              } focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500`}
+            >
+              {mobileMenuOpen ? (
+                <XIcon className="block h-6 w-6" />
+              ) : (
+                <ListIcon className="block h-6 w-6" />
+              )}
             </button>
           </div>
         </div>
-      )}
+      </div>
+    </nav>
 
+    {/* Mobile menu */}
+    {mobileMenuOpen && (
+      <div className={`sm:hidden fixed top-16 left-0 right-0 z-40 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+        <div className="pt-2 pb-3 space-y-1">
+          <NavItem icon={<HomeIcon className="h-5 w-5" />} text="Home" mobile active={activeSection === 'Home'} onClick={() => { setActiveSection('Home'); setMobileMenuOpen(false); }} theme={theme} />
+          <NavItem icon={<ListIcon className="h-5 w-5" />} text="List" mobile active={activeSection === 'List'} onClick={() => { setShowMyListsModal(true); setMobileMenuOpen(false); }} theme={theme} />
+          <NavItem icon={<FlameIcon className="h-5 w-5" />} text="Trending" mobile active={activeSection === 'Trending'} onClick={() => { setActiveSection('Trending'); setMobileMenuOpen(false); }} theme={theme} />
+          <NavItem
+            icon={<BuildingIcon className="h-5 w-5" />}
+            text="Companies"
+            mobile
+            active={activeSection === 'Companies'}
+            onClick={() => {
+              setShowCompanies(true)
+              setActiveSection('Companies')
+              setMobileMenuOpen(false)
+            }}
+            theme={theme}
+          />
+          <NavItem 
+            icon={<LogOutIcon className="h-5 w-5" />} 
+            text="Sign Out" 
+            mobile 
+            onClick={() => {
+              // Add logic for signing out
+              setMobileMenuOpen(false);
+            }} 
+            theme={theme} 
+          />
+          <button
+            onClick={() => { toggleTheme(); setMobileMenuOpen(false); }}
+            className={`w-full text-left px-3 py-2 rounded-md text-base font-medium ${
+              theme === 'dark' ? 'text-gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+            }`}
+          >
+            {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          </button>
+        </div>
+      </div>
+    )}
       {/* Main content */}
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 mt-16">
         {/* Search and filter */}
         <div className="max-w-3xl mx-auto mb-6 px-4 sm:px-0">
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
@@ -348,7 +320,8 @@ export default function Dashboard() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className={`w-full pl-10 pr-4 py-2 border ${
-                  theme === 'dark' ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'
+                  theme === 
+                  'dark' ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'
                 } rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500`}
               />
               <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -385,7 +358,7 @@ export default function Dashboard() {
 
         {/* Pagination */}
         {activeSection !== 'Trending' && (
-          <div className="mt-8 flex justify-center">
+          <div className="mt-8 flex justify-center items-center space-x-4">
             <nav className={`relative z-0 inline-flex rounded-md shadow-sm -space-x-px ${
               theme === 'dark' ? 'bg-gray-800' : 'bg-white'
             }`} aria-label="Pagination">
@@ -407,7 +380,7 @@ export default function Dashboard() {
                 disabled={currentPage === totalPages}
                 className={`relative inline-flex items-center px-2 py-2 rounded-r-md border ${
                   theme === 'dark'
-                    ? 'border-gray-700 bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    ? 'border-gray-1000 bg-gray-800 text-gray-400 hover:bg-gray-700'
                     : 'border-gray-300 bg-white text-gray-500 hover:bg-gray-50'
                 } text-sm font-medium ${
                   currentPage === totalPages ? 'cursor-not-allowed' : ''
@@ -422,39 +395,54 @@ export default function Dashboard() {
 
       {/* Companies modal */}
       {showCompanies && (
-        <div className="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div className="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+          <div className="flex items-center justify-center min-h-screen px-4 py-6 sm:p-0">
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div className={`inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full ${
+            <div className={`relative inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full ${
               theme === 'dark' ? 'bg-gray-800' : 'bg-white'
             }`}>
-              <div className={`px-4 pt-5 pb-4 sm:p-6 sm:pb-4 ${
+              <div className={`px-4 pt-5 pb-4 sm:p-6 ${
                 theme === 'dark' ? 'bg-gray-800' : 'bg-white'
               }`}>
                 <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                    <h3 className={`text-lg leading-6 font-medium ${
+                  <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                    <h3 className={`text-lg leading-6 font-medium mb-4 ${
                       theme === 'dark' ? 'text-white' : 'text-gray-900'
                     }`} id="modal-title">
                       Select a Company
                     </h3>
-                    <div className="mt-4 grid grid-cols-2 gap-4">
-                      {companies.map((company) => (
-                        <button
-                          key={company}
-                          onClick={() => {
-                            // Here you can add logic to filter blogs by company
-                            setShowCompanies(false)
-                          }}
-                          className={`text-left px-4 py-2 rounded-md text-sm font-medium ${
-                            theme === 'dark'
-                              ? 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                              : 'text-gray-700 hover:bg-purple-50 hover:text-purple-700'
-                          } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200`}
-                        >
-                          {company}
-                        </button>
+                    <div 
+                      className="mt-2 max-h-[60vh] overflow-y-auto pr-2"
+                      style={{
+                        scrollbarWidth: 'thin',
+                        scrollbarColor: theme === 'dark' ? '#4a5568 #2d3748' : '#cbd5e0 #edf2f7',
+                      }}
+                    >
+                      {Object.entries(groupedCompanies).map(([letter, companies]) => (
+                        <div key={letter} className="mb-4">
+                          <h4 className={`text-2xl font-bold mb-2 sticky top-0 z-10 py-1 ${
+                            theme === 'dark' ? 'text-gray-300 bg-gray-800' : 'text-gray-600 bg-white'
+                          }`}>
+                            {letter}
+                          </h4>
+                          {companies.map((company) => (
+                            <button
+                              key={company}
+                              onClick={() => setSelectedCompany(company)}
+                              className={`w-full text-left px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                                selectedCompany === company
+                                  ? theme === 'dark'
+                                    ? 'bg-purple-700 text-white'
+                                    : 'bg-purple-100 text-purple-900'
+                                  : theme === 'dark'
+                                  ? 'text-gray-300 hover:bg-gray-700'
+                                  : 'text-gray-700 hover:bg-gray-100'
+                              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500`}
+                            >
+                              {company}
+                            </button>
+                          ))}
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -470,7 +458,12 @@ export default function Dashboard() {
                       ? 'bg-purple-600 hover:bg-purple-700 text-white'
                       : 'bg-purple-600 text-white hover:bg-purple-700'
                   } text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:ml-3 sm:w-auto sm:text-sm`}
-                  onClick={() => setShowCompanies(false)}
+                  onClick={() => {
+                    if (selectedCompany) {
+                      toast.success(`Selected ${selectedCompany}`)
+                    }
+                    setShowCompanies(false)
+                  }}
                 >
                   Close
                 </button>
@@ -479,7 +472,6 @@ export default function Dashboard() {
           </div>
         </div>
       )}
-
       {/* Bookmark modal */}
       {showBookmarkModal && (
         <div className="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -676,21 +668,21 @@ export default function Dashboard() {
   )
 }
 
-const NavItem = ({ href, icon, text, active, onClick, mobile, theme }) => (
+const NavItem = ({ icon, text, active, onClick, mobile, theme }) => (
   <button
     onClick={onClick}
-    className={`${mobile ? 'block w-full text-left' : 'inline-flex items-center'} px-3 py-2 rounded-md text-sm font-medium ${
+    className={`${mobile ? 'flex w-full items-center' : 'inline-flex items-center'} px-3 py-2 rounded-md text-sm font-medium ${
       active
         ? theme === 'dark'
-          ? 'bg-gray-900 text-white'
-          : 'bg-gray-100 text-gray-900'
+          ? 'bg-purple-900 text-white'
+          : 'bg-purple-100 text-purple-900'
         : theme === 'dark'
         ? 'text-gray-300 hover:bg-gray-700 hover:text-white'
         : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-    }`}
+    } transition-colors duration-200`}
   >
-    {React.cloneElement(icon, { className: `${icon.props.className} ${mobile ? 'mr-3' : 'mr-1.5'}` })}
-    {text}
+    {React.cloneElement(icon, { className: `${icon.props.className} ${mobile  ? 'mr-3' : 'mr-1.5'}` })}
+    <span>{text}</span>
   </button>
 )
 
