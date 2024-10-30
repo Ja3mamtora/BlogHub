@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { HomeIcon, ListIcon, FlameIcon, BuildingIcon, ArrowUpIcon, BookmarkIcon, SearchIcon, XIcon, ZapIcon, FilterIcon, PlusIcon, SunIcon, MoonIcon, LogOutIcon } from 'lucide-react'
+import { HomeIcon, ListIcon, FlameIcon, BuildingIcon, ArrowUpIcon, BookmarkIcon, SearchIcon, XIcon, ZapIcon, FilterIcon, PlusIcon, SunIcon, MoonIcon, LogOutIcon, TrashIcon} from 'lucide-react'
 import { Toaster, toast } from 'react-hot-toast'
 
 const companies = [
@@ -99,6 +99,65 @@ const initialBlogs = [
   },
 ]
 
+const initialBookmarkLists = [
+  {
+    name: 'Reading List',
+    blogs: [
+      { id: 1, title: 'Getting Started with React', date: '2024-01-15', readTime: '5 min read', tags: ['React', 'Frontend'] },
+      { id: 2, title: 'Advanced JavaScript Concepts', date: '2024-01-16', readTime: '8 min read', tags: ['JavaScript'] },
+      { id: 7, title: 'Understanding React Context API', date: '2024-02-10', readTime: '6 min read', tags: ['React'] },
+      { id: 8, title: 'Intro to Progressive Web Apps', date: '2024-02-12', readTime: '9 min read', tags: ['PWA', 'Frontend'] },
+      { id: 3, title: 'Understanding TypeScript', date: '2024-01-17', readTime: '6 min read', tags: ['TypeScript'] },
+      { id: 4, title: 'CSS Grid Layout Guide', date: '2024-01-18', readTime: '4 min read', tags: ['CSS'] },
+      { id: 5, title: 'Modern Web Development', date: '2024-01-19', readTime: '7 min read', tags: ['Web Dev'] },
+      { id: 9, title: 'Using APIs Effectively', date: '2024-02-13', readTime: '5 min read', tags: ['API', 'Backend'] },
+      { id: 10, title: 'Async JavaScript Deep Dive', date: '2024-02-15', readTime: '10 min read', tags: ['JavaScript', 'Async'] },
+    ]
+  },
+  {
+    name: 'Tech Articles',
+    blogs: [
+      { id: 3, title: 'Understanding TypeScript', date: '2024-01-17', readTime: '6 min read', tags: ['TypeScript'] },
+      { id: 4, title: 'CSS Grid Layout Guide', date: '2024-01-18', readTime: '4 min read', tags: ['CSS'] },
+      { id: 5, title: 'Modern Web Development', date: '2024-01-19', readTime: '7 min read', tags: ['Web Dev'] },
+      { id: 9, title: 'Using APIs Effectively', date: '2024-02-13', readTime: '5 min read', tags: ['API', 'Backend'] },
+      { id: 10, title: 'Async JavaScript Deep Dive', date: '2024-02-15', readTime: '10 min read', tags: ['JavaScript', 'Async'] },
+    ]
+  },
+  {
+    name: 'Favorites',
+    blogs: [
+      { id: 6, title: 'Node.js Best Practices', date: '2024-01-20', readTime: '10 min read', tags: ['Node.js', 'Backend'] },
+      { id: 11, title: 'Microservices Architecture', date: '2024-02-18', readTime: '12 min read', tags: ['Microservices'] },
+      { id: 12, title: 'Docker for Beginners', date: '2024-02-20', readTime: '8 min read', tags: ['Docker', 'DevOps'] },
+    ]
+  },
+  {
+    name: 'AI & ML',
+    blogs: [
+      { id: 13, title: 'Intro to Machine Learning', date: '2024-02-22', readTime: '15 min read', tags: ['Machine Learning'] },
+      { id: 14, title: 'Neural Networks Basics', date: '2024-02-24', readTime: '14 min read', tags: ['Neural Networks', 'AI'] },
+      { id: 15, title: 'Natural Language Processing', date: '2024-02-26', readTime: '18 min read', tags: ['NLP', 'AI'] },
+    ]
+  },
+  {
+    name: 'DevOps',
+    blogs: [
+      { id: 16, title: 'CI/CD Pipelines Explained', date: '2024-02-28', readTime: '7 min read', tags: ['DevOps', 'CI/CD'] },
+      { id: 17, title: 'Kubernetes 101', date: '2024-03-01', readTime: '9 min read', tags: ['Kubernetes'] },
+      { id: 18, title: 'Serverless Computing Guide', date: '2024-03-03', readTime: '11 min read', tags: ['Serverless', 'Cloud'] },
+    ]
+  },
+  {
+    name: 'Data Science',
+    blogs: [
+      { id: 19, title: 'Data Visualization with D3.js', date: '2024-03-05', readTime: '10 min read', tags: ['D3.js', 'Data Science'] },
+      { id: 20, title: 'Statistical Analysis Basics', date: '2024-03-07', readTime: '12 min read', tags: ['Statistics', 'Data Science'] },
+      { id: 21, title: 'Python for Data Science', date: '2024-03-09', readTime: '8 min read', tags: ['Python', 'Data Science'] },
+    ]
+  }
+];
+
 const categories = ["All", "Technology", "Design", "Marketing", "Business", "Lifestyle"]
 
 export default function Dashboard() {
@@ -110,13 +169,16 @@ export default function Dashboard() {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [activeSection, setActiveSection] = useState('Home')
   const [showBookmarkModal, setShowBookmarkModal] = useState(false)
-  const [showRemoveBookmarkModal, setShowRemoveBookmarkModal] = useState(false)
   const [selectedBlogId, setSelectedBlogId] = useState(null)
-  const [bookmarkLists, setBookmarkLists] = useState(['Favorites', 'Read Later'])
   const [newListName, setNewListName] = useState('')
   const [theme, setTheme] = useState('light')
   const [showMyListsModal, setShowMyListsModal] = useState(false)
   const [selectedCompany, setSelectedCompany] = useState(null)
+  const [bookmarkLists, setBookmarkLists] = useState(initialBookmarkLists)
+  const [showDeleteListConfirmation, setShowDeleteListConfirmation] = useState(false)
+  const [listToDelete, setListToDelete] = useState(null)
+  const [showDeleteBlogConfirmation, setShowDeleteBlogConfirmation] = useState(false)
+  const [blogToDelete, setBlogToDelete] = useState(null)
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') || 'light'
@@ -131,6 +193,30 @@ export default function Dashboard() {
     document.documentElement.classList.toggle('dark', newTheme === 'dark')
   }
 
+  const handleDeleteList = (listName) => {
+    setListToDelete(listName)
+    setShowDeleteListConfirmation(true)
+  }
+
+  const confirmDeleteList = () => {
+    setBookmarkLists(bookmarkLists.filter(list => list.name !== listToDelete))
+    setShowDeleteListConfirmation(false)
+    setListToDelete(null)
+    toast.success(`List "${listToDelete}" deleted successfully`)
+  }
+
+  const handleDeleteBlog = (listName, blogId) => {
+    setBlogToDelete({ listName, blogId })
+    setShowDeleteBlogConfirmation(true)
+  }
+
+  const deleteBlog = () => {
+    setBlogs(blogs.map(blog =>
+      blog.id === selectedBlogId ? { ...blog, saved: false } : blog
+    ))
+    setShowDeleteBlogConfirmation(false)
+    toast.success('Blog removed from saved list')
+  }
   const groupedCompanies = useMemo(() => {
     return companies.sort().reduce((acc, company) => {
       const initial = company[0].toUpperCase()
@@ -167,7 +253,7 @@ export default function Dashboard() {
     const blog = blogs.find(blog => blog.id === blogId)
     if (blog.saved) {
       setSelectedBlogId(blogId)
-      setShowRemoveBookmarkModal(true)
+      setShowDeleteBlogConfirmation(true)
     } else {
       setSelectedBlogId(blogId)
       setShowBookmarkModal(true)
@@ -184,130 +270,127 @@ export default function Dashboard() {
 
   const createNewList = () => {
     if (newListName.trim() !== '') {
-      setBookmarkLists([...bookmarkLists, newListName.trim()])
+      const newList = {
+        name: newListName.trim(),
+        blogs: []
+      }
+      setBookmarkLists([...bookmarkLists, newList])
       handleBookmark(newListName.trim())
       setNewListName('')
     }
   }
 
-  const removeBookmark = () => {
-    setBlogs(blogs.map(blog =>
-      blog.id === selectedBlogId ? { ...blog, saved: false } : blog
-    ))
-    setShowRemoveBookmarkModal(false)
-    toast.success('Bookmark removed successfully')
-  }
-
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-black'}`}>
-    <Toaster position="bottom-center" />
-    {/* Navbar */}
-    <nav className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-md fixed top-0 left-0 right-0 z-50`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex-shrink-0 flex items-center">
-            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text">BlogSpace</span>
+      <Toaster position="bottom-center" />
+      {/* Navbar */}
+      <nav className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-md fixed top-0 left-0 right-0 z-50`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex-shrink-0 flex items-center">
+              <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text">BlogSpace</span>
+            </div>
+            <div className="hidden sm:ml-6 sm:flex sm:items-center">
+              <NavItem icon={<HomeIcon className="h-5 w-5" />} text="Home" active={activeSection === 'Home'} onClick={() => setActiveSection('Home')} theme={theme} />
+              <NavItem 
+                icon={<ListIcon className="h-5 w-5" />} 
+                text="List" 
+                active={activeSection === 'List'} 
+                onClick={() => {
+                  setShowMyListsModal(true);
+                }}
+                theme={theme} 
+              />
+              <NavItem icon={<FlameIcon className="h-5 w-5" />} text="Trending" active={activeSection === 'Trending'} onClick={() => setActiveSection('Trending')} theme={theme} />
+              <NavItem
+                icon={<BuildingIcon className="h-5 w-5" />}
+                text="Companies"
+                active={activeSection === 'Companies'}
+                onClick={() => {
+                  setShowCompanies(true)
+                  setActiveSection('Companies')
+                }}
+                theme={theme}
+              />
+              <button
+                onClick={() => {
+                  // Add logic for signing out
+                }}
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                  theme === 'dark' 
+                    ? 'text-gray-300 hover:bg-gray-700 hover:text-white' 
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <LogOutIcon className="h-5 w-5 mr-2" />
+                Sign Out
+              </button>
+              <button
+                onClick={toggleTheme}
+                className={`ml-4 p-2 rounded-full ${theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-gray-200 text-gray-600'}`}
+              >
+                {theme === 'dark' ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
+              </button>
+            </div>
+            <div className="flex items-center sm:hidden">
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className={`inline-flex items-center justify-center p-2 rounded-md ${
+                  theme === 'dark' ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' : 'text-gray-400 hover:text-gray-500 hover:bg-gray-100'
+                } focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500`}
+              >
+                {mobileMenuOpen ? (
+                  <XIcon className="block h-6 w-6" />
+                ) : (
+                  <ListIcon className="block h-6 w-6" />
+                )}
+              </button>
+            </div>
           </div>
-          <div className="hidden sm:ml-6 sm:flex sm:items-center">
-            <NavItem icon={<HomeIcon className="h-5 w-5" />} text="Home" active={activeSection === 'Home'} onClick={() => setActiveSection('Home')} theme={theme} />
-            <NavItem 
-              icon={<ListIcon className="h-5 w-5" />} 
-              text="List" 
-              active={activeSection === 'List'} 
-              onClick={() => {
-                setShowMyListsModal(true);
-              }}
-              theme={theme} 
-            />
-            <NavItem icon={<FlameIcon className="h-5 w-5" />} text="Trending" active={activeSection === 'Trending'} onClick={() => setActiveSection('Trending')} theme={theme} />
+        </div>
+      </nav>
+
+      {/* Mobile menu */}
+      {mobileMenuOpen && (
+        <div className={`sm:hidden fixed top-16 left-0 right-0 z-40 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+          <div className="pt-2 pb-3 space-y-1">
+            <NavItem icon={<HomeIcon className="h-5 w-5" />} text="Home" mobile active={activeSection === 'Home'} onClick={() => { setActiveSection('Home'); setMobileMenuOpen(false); }} theme={theme} />
+            <NavItem icon={<ListIcon className="h-5 w-5" />} text="List" mobile active={activeSection === 'List'} onClick={() => { setShowMyListsModal(true); setMobileMenuOpen(false); }} theme={theme} />
+            <NavItem icon={<FlameIcon className="h-5 w-5" />} text="Trending" mobile active={activeSection === 'Trending'} onClick={() => { setActiveSection('Trending'); setMobileMenuOpen(false); }} theme={theme} />
             <NavItem
               icon={<BuildingIcon className="h-5 w-5" />}
               text="Companies"
+              mobile
               active={activeSection === 'Companies'}
               onClick={() => {
                 setShowCompanies(true)
                 setActiveSection('Companies')
+                setMobileMenuOpen(false)
               }}
               theme={theme}
             />
-            <button
+            <NavItem 
+              icon={<LogOutIcon className="h-5 w-5" />} 
+              text="Sign Out" 
+              mobile 
               onClick={() => {
                 // Add logic for signing out
-              }}
-              className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                theme === 'dark' 
-                  ? 'text-gray-300 hover:bg-gray-700 hover:text-white' 
-                  : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                setMobileMenuOpen(false);
+              }} 
+              theme={theme} 
+            />
+            <button
+              onClick={() => { toggleTheme(); setMobileMenuOpen(false); }}
+              className={`w-full text-left px-3 py-2 rounded-md text-base font-medium ${
+                theme === 'dark' ? 'text-gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
               }`}
             >
-              <LogOutIcon className="h-5 w-5 mr-2" />
-              Sign Out
-            </button>
-            <button
-              onClick={toggleTheme}
-              className={`ml-4 p-2 rounded-full ${theme === 'dark' ? 'bg-gray-700 text-yellow-400' : 'bg-gray-200 text-gray-600'}`}
-            >
-              {theme === 'dark' ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
-            </button>
-          </div>
-          <div className="flex items-center sm:hidden">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`inline-flex items-center justify-center p-2 rounded-md ${
-                theme === 'dark' ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' : 'text-gray-400 hover:text-gray-500 hover:bg-gray-100'
-              } focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500`}
-            >
-              {mobileMenuOpen ? (
-                <XIcon className="block h-6 w-6" />
-              ) : (
-                <ListIcon className="block h-6 w-6" />
-              )}
+              {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
             </button>
           </div>
         </div>
-      </div>
-    </nav>
+      )}
 
-    {/* Mobile menu */}
-    {mobileMenuOpen && (
-      <div className={`sm:hidden fixed top-16 left-0 right-0 z-40 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
-        <div className="pt-2 pb-3 space-y-1">
-          <NavItem icon={<HomeIcon className="h-5 w-5" />} text="Home" mobile active={activeSection === 'Home'} onClick={() => { setActiveSection('Home'); setMobileMenuOpen(false); }} theme={theme} />
-          <NavItem icon={<ListIcon className="h-5 w-5" />} text="List" mobile active={activeSection === 'List'} onClick={() => { setShowMyListsModal(true); setMobileMenuOpen(false); }} theme={theme} />
-          <NavItem icon={<FlameIcon className="h-5 w-5" />} text="Trending" mobile active={activeSection === 'Trending'} onClick={() => { setActiveSection('Trending'); setMobileMenuOpen(false); }} theme={theme} />
-          <NavItem
-            icon={<BuildingIcon className="h-5 w-5" />}
-            text="Companies"
-            mobile
-            active={activeSection === 'Companies'}
-            onClick={() => {
-              setShowCompanies(true)
-              setActiveSection('Companies')
-              setMobileMenuOpen(false)
-            }}
-            theme={theme}
-          />
-          <NavItem 
-            icon={<LogOutIcon className="h-5 w-5" />} 
-            text="Sign Out" 
-            mobile 
-            onClick={() => {
-              // Add logic for signing out
-              setMobileMenuOpen(false);
-            }} 
-            theme={theme} 
-          />
-          <button
-            onClick={() => { toggleTheme(); setMobileMenuOpen(false); }}
-            className={`w-full text-left px-3 py-2 rounded-md text-base font-medium ${
-              theme === 'dark' ? 'text-gray-300 hover:bg-gray-700 hover:text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-            }`}
-          >
-            {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-          </button>
-        </div>
-      </div>
-    )}
       {/* Main content */}
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 mt-16">
         {/* Search and filter */}
@@ -335,7 +418,7 @@ export default function Dashboard() {
                 } rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none`}
               >
                 {categories.map((category) => (
-                  <option key={category} value={category}>{category}</option>
+                  <option key={category} >{category}</option>
                 ))}
               </select>
               <FilterIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -350,7 +433,7 @@ export default function Dashboard() {
               key={blog.id}
               blog={blog}
               toggleUpvote={toggleUpvote}
-              toggleSave={toggleSave}
+              toggleSave={() => toggleSave(blog.id)}
               theme={theme}
             />
           ))}
@@ -472,6 +555,7 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
       {/* Bookmark modal */}
       {showBookmarkModal && (
         <div className="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -494,15 +578,15 @@ export default function Dashboard() {
                     <div className="mt-4 space-y-2">
                       {bookmarkLists.map((list) => (
                         <button
-                          key={list}
-                          onClick={() => handleBookmark(list)}
+                          key={list.name}
+                          onClick={() => handleBookmark(list.name)}
                           className={`w-full text-left px-4 py-2 rounded-md text-sm font-medium ${
                             theme === 'dark'
                               ? 'text-gray-300 hover:bg-gray-700 hover:text-white'
                               : 'text-gray-700 hover:bg-purple-50 hover:text-purple-700'
                           } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200`}
                         >
-                          {list}
+                          {list.name}
                         </button>
                       ))}
                     </div>
@@ -553,71 +637,15 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Remove Bookmark modal */}
-      {showRemoveBookmarkModal && (
-        <div className="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          <div className="flex items-center justify-center min-h-screen p-4 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div className={`inline-block align-middle rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full ${
-              theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-            }`}>
-              <div className={`px-4 pt-5 pb-4 sm:p-6 sm:pb-4 ${
-                theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-              }`}>
-                <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3 className={`text-lg leading-6 font-medium ${
-                      theme === 'dark' ? 'text-white' : 'text-gray-900'
-                    }`} id="modal-title">
-                      Remove Bookmark
-                    </h3>
-                    <div className="mt-2">
-                      <p className={`text-sm ${
-                        theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
-                      }`}>
-                        Are you sure you want to remove this blog from your bookmarks?
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className={`px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse ${
-                theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
-              }`}>
-                <button
-                  type="button"
-                  className={`mt-3 w-full inline-flex justify-center rounded-md border shadow-sm px-4 py-2 bg-red-600 text-wheat-500 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm`}
-                  onClick={removeBookmark}
-                >
-                  Yes, Remove
-                </button>
-                <button
-                  type="button"
-                  className={`mt-3 w-full inline-flex justify-center rounded-md border shadow-sm px-4 py-2 ${
-                    theme === 'dark'
-                      ? 'bg-gray-700 text-gray-300 hover:bg-gray-600 border-gray-500'
-                      : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
-                  } text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm`}
-                  onClick={() => setShowRemoveBookmarkModal(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* My Lists modal */}
       {showMyListsModal && (
         <div className="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div className="flex items-center justify-center min-h-screen p-4 text-center sm:block sm:p-0">
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-50 transition-opacity" aria-hidden="true"></div>
-          <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-          <div className={`inline-block align-middle rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full ${
-            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-          }`}>
+          <div className="flex items-center justify-center min-h-screen p-4 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div className={`inline-block align-middle rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-xl sm:w-full ${
+              theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+            }`}>
               <div className={`px-4 pt-5 pb-4 sm:p-6 sm:pb-4 ${
                 theme === 'dark' ? 'bg-gray-800' : 'bg-white'
               }`}>
@@ -628,17 +656,53 @@ export default function Dashboard() {
                     }`} id="modal-title">
                       My Lists
                     </h3>
-                    <div className="mt-4 space-y-2">
+                    <div className="mt-4 space-y-4">
                       {bookmarkLists.map((list) => (
-                        <div
-                          key={list}
-                          className={`px-4 py-2 rounded-md text-sm font-medium ${
-                            theme === 'dark'
-                              ? 'bg-gray-700 text-gray-300'
-                              : 'bg-gray-100 text-gray-700'
-                          }`}
-                        >
-                          {list}
+                        <div key={list.name} className={`p-4 rounded-lg ${
+                          theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
+                        }`}>
+                          <div className="flex justify-between items-center mb-2">
+                            <h4 className={`text-lg font-semibold ${
+                              theme === 'dark' ? 'text-white' : 'text-gray-900'
+                            }`}>{list.name}</h4>
+                            <div className="flex items-center space-x-2">
+                              <span className={`text-sm ${
+                                theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                              }`}>{list.blogs.length} blogs</span>
+                              <button
+                                onClick={() => handleDeleteList(list.name)}
+                                className={`p-1 rounded-full ${
+                                  theme === 'dark' ? 'bg-red-900 text-red-200 hover:bg-red-800' : 'bg-red-100 text-red-600 hover:bg-red-200'
+                                }`}
+                              >
+                                <TrashIcon className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {list.blogs.map((blog) => (
+                              <div key={blog.id} className={`p-2 rounded ${
+                                theme === 'dark' ? 'bg-gray-600' : 'bg-white'
+                              } flex justify-between items-center`}>
+                                <div>
+                                  <h5 className={`text-sm font-medium ${
+                                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                                  }`}>{blog.title}</h5>
+                                  <p className={`text-xs ${
+                                    theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                                  }`}>{blog.readTime}</p>
+                                </div>
+                                <button
+                                  onClick={() => handleDeleteBlog(list.name, blog.id)}
+                                  className={`p-1 rounded-full ${
+                                    theme === 'dark' ? 'bg-red-900 text-red-200 hover:bg-red-800' : 'bg-red-100 text-red-600 hover:bg-red-200'
+                                  }`}
+                                >
+                                  <XIcon className="h-4 w-4" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -658,6 +722,118 @@ export default function Dashboard() {
                   onClick={() => setShowMyListsModal(false)}
                 >
                   Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete List Confirmation Modal */}
+      {showDeleteListConfirmation && (
+        <div className="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+          <div className="flex items-center justify-center min-h-screen p-4 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div className={`inline-block align-middle rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full ${
+              theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+            }`}>
+              <div className={`px-4 pt-5 pb-4 sm:p-6 sm:pb-4 ${
+                theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+              }`}>
+                <div className="sm:flex sm:items-start">
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <h3 className={`text-lg leading-6 font-medium ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`} id="modal-title">
+                      Delete List
+                    </h3>
+                    <div className="mt-2">
+                      <p className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                      }`}>
+                        Are you sure you want to delete the list "{listToDelete}"? This action cannot be undone.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={`px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse ${
+                theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+              }`}>
+                <button
+                  type="button"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border shadow-sm px-4 py-2 bg-red-600 text-wheat-500 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                  onClick={confirmDeleteList}
+                >
+                  Delete
+                </button>
+                <button
+                  type="button"
+                  className={`mt-3 w-full inline-flex justify-center rounded-md border shadow-sm px-4 py-2 ${
+                    theme === 'dark'
+                      ? 'bg-gray-700 text-gray-300 hover:bg-gray-600 border-gray-500'
+                      : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
+                  } text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm`}
+                  onClick={() => setShowDeleteListConfirmation(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Blog Confirmation Modal */}
+      {showDeleteBlogConfirmation && (
+        <div className="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+          <div className="flex items-center justify-center min-h-screen p-4 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div className={`inline-block align-middle rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full ${
+              theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+            }`}>
+              <div className={`px-4 pt-5 pb-4 sm:p-6 sm:pb-4 ${
+                theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+              }`}>
+                <div className="sm:flex sm:items-start">
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <h3 className={`text-lg leading-6 font-medium ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`} id="modal-title">
+                      Remove Saved Blog
+                    </h3>
+                    <div className="mt-2">
+                      <p className={`text-sm ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                      }`}>
+                        Are you sure you want to remove this blog from your saved list?
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className={`px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse ${
+                theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+              }`}>
+                <button
+                  type="button"
+                  className={`mt-3 w-full inline-flex justify-center rounded-md border shadow-sm px-4 py-2 bg-red-600 text-wheat-500 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm`}
+                  onClick={deleteBlog}
+                >
+                  Remove
+                </button>
+                <button
+                  type="button"
+                  className={`mt-3 w-full inline-flex justify-center rounded-md border shadow-sm px-4 py-2 ${
+                    theme === 'dark'
+                      ? 'bg-gray-700 text-gray-300 hover:bg-gray-600 border-gray-500'
+                      : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
+                  } text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm`}
+                  onClick={() => setShowDeleteBlogConfirmation(false)}
+                >
+                  Cancel
                 </button>
               </div>
             </div>
