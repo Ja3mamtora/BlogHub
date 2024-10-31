@@ -158,7 +158,7 @@ const initialBookmarkLists = [
   }
 ];
 
-const categories = ["All", "Technology", "Design", "Marketing", "Business", "Lifestyle"]
+const categories = ['All','AI', 'API', 'Algorithm', 'Android', 'Big Data', 'Blockchain', 'CI/CD', 'Cloud Computing', 'Cyber Security', 'Data Engineering', 'Data Science', 'Database', 'DevOps', 'Engineering', 'Feature', 'FinTech', 'Gen_AI', 'Hardware', 'HealthTech', 'IT','IOS', 'IoT', 'Java', 'LLM', 'Machine Learning', 'Management', 'Marketing', 'Migration', 'NLP', 'NoSQL', 'Optimization', 'Productivity', 'Programming', 'Redis', 'SRE', 'SaaS', 'Software Development', 'Sustainability', 'Technology', 'UI/UX', 'Web Development']
 
 export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1)
@@ -394,37 +394,63 @@ export default function Dashboard() {
       {/* Main content */}
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 mt-16">
         {/* Search and filter */}
-        <div className="max-w-3xl mx-auto mb-6 px-4 sm:px-0">
+        <div className="max-w-4xl mx-auto mb-8 px-4 sm:px-6 lg:px-8">
+        <div className={`bg-gradient-to-r ${
+          theme === 'dark' 
+            ? 'from-purple-900 to-indigo-900' 
+            : 'from-purple-100 to-indigo-100'
+        } rounded-xl shadow-lg p-3`}>
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-            <div className="relative flex-grow">
+            <div className="relative flex-grow group">
               <input
                 type="text"
                 placeholder="Search blogs..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2 border ${
-                  theme === 
-                  'dark' ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'
-                } rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+                className={`w-full pl-12 pr-10 py-3 border-2 ${
+                  theme === 'dark' 
+                    ? 'border-purple-500 bg-gray-800 text-white placeholder-purple-300' 
+                    : 'border-purple-300 bg-white text-gray-900 placeholder-purple-500'
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-300`}
               />
-              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <SearchIcon className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-6 w-6 ${
+                theme === 'dark' ? 'text-purple-400' : 'text-purple-500'
+              }`} />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                >
+                  <XIcon className="h-5 w-5" />
+                </button>
+              )}
             </div>
-            <div className="relative w-full sm:w-auto">
+            <div className="relative sm:w-64">
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2 border ${
-                  theme === 'dark' ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white text-black'
-                } rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none`}
+                className={`w-full pl-12 pr-10 py-3 border-2 ${
+                  theme === 'dark' 
+                    ? 'border-indigo-500 bg-gray-800 text-white' 
+                    : 'border-indigo-300 bg-white text-gray-900'
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none cursor-pointer transition duration-300`}
               >
                 {categories.map((category) => (
-                  <option key={category} >{category}</option>
+                  <option key={category} value={category}>{category}</option>
                 ))}
               </select>
-              <FilterIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <FilterIcon className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-6 w-6 ${
+                theme === 'dark' ? 'text-indigo-400' : 'text-indigo-500'
+              } pointer-events-none`} />
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <svg className="h-5 w-5 text-gray-400" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                  <path d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
         {/* Blog grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 px-4 sm:px-0">
