@@ -639,94 +639,116 @@ export default function Dashboard() {
 
       {/* My Lists modal */}
       {showMyListsModal && (
-        <div className="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          <div className="flex items-center justify-center min-h-screen p-4 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div className={`inline-block align-middle rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-xl sm:w-full ${
+      <div className="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div className="flex items-center justify-center min-h-screen p-4 text-center sm:block sm:p-0">
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+          <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+          <div className={`inline-block align-middle rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-xl sm:w-full ${
+            theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+          }`}>
+            <div className={`px-4 pt-5 pb-4 sm:p-6 sm:pb-4 ${
               theme === 'dark' ? 'bg-gray-800' : 'bg-white'
             }`}>
-              <div className={`px-4 pt-5 pb-4 sm:p-6 sm:pb-4 ${
-                theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-              }`}>
-                <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                    <h3 className={`text-lg leading-6 font-medium ${
-                      theme === 'dark' ? 'text-white' : 'text-gray-900'
-                    }`} id="modal-title">
-                      My Lists
-                    </h3>
-                    <div className="mt-4 space-y-4">
-                      {bookmarkLists.map((list) => (
-                        <div key={list.name} className={`p-4 rounded-lg ${
-                          theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
-                        }`}>
-                          <div className="flex justify-between items-center mb-2">
-                            <h4 className={`text-lg font-semibold ${
-                              theme === 'dark' ? 'text-white' : 'text-gray-900'
-                            }`}>{list.name}</h4>
-                            <div className="flex items-center space-x-2">
-                              <span className={`text-sm ${
-                                theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                              }`}>{list.blogs.length} blogs</span>
-                              <button
-                                onClick={() => handleDeleteList(list.name)}
-                                className={`p-1 rounded-full ${
-                                  theme === 'dark' ? 'bg-red-900 text-red-200 hover:bg-red-800' : 'bg-red-100 text-red-600 hover:bg-red-200'
-                                }`}
-                              >
-                                <TrashIcon className="h-4 w-4" />
-                              </button>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            {list.blogs.map((blog) => (
-                              <div key={blog.id} className={`p-2 rounded ${
-                                theme === 'dark' ? 'bg-gray-600' : 'bg-white'
-                              } flex justify-between items-center`}>
-                                <div>
-                                  <h5 className={`text-sm font-medium ${
-                                    theme === 'dark' ? 'text-white' : 'text-gray-900'
-                                  }`}>{blog.title}</h5>
-                                  <p className={`text-xs ${
-                                    theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                                  }`}>{blog.readTime}</p>
-                                </div>
-                                <button
-                                  onClick={() => handleDeleteBlog(list.name, blog.id)}
-                                  className={`p-1 rounded-full ${
-                                    theme === 'dark' ? 'bg-red-900 text-red-200 hover:bg-red-800' : 'bg-red-100 text-red-600 hover:bg-red-200'
-                                  }`}
-                                >
-                                  <XIcon className="h-4 w-4" />
-                                </button>
-                              </div>
-                            ))}
+              <div className="sm:flex sm:items-start">
+                <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                  <h3 className={`text-lg leading-6 font-medium mb-4 ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`} id="modal-title">
+                    My Lists
+                  </h3>
+                  <div className="mb-4 flex">
+                    <input
+                      type="text"
+                      placeholder="Enter new list name"
+                      value={newListName}
+                      onChange={(e) => setNewListName(e.target.value)}
+                      className={`flex-grow px-3 py-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                        theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'
+                      }`}
+                    />
+                    <button
+                      onClick={createNewList}
+                      className={`inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-r-md shadow-sm text-sm font-medium ${
+                        theme === 'dark'
+                          ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                          : 'bg-purple-600 text-white hover:bg-purple-700'
+                      } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500`}
+                    >
+                      <PlusIcon className="h-5 w-5 mr-2" />
+                      Create
+                    </button>
+                  </div>
+                  <div className="mt-4 space-y-4 max-h-[60vh] overflow-y-auto">
+                    {bookmarkLists.map((list) => (
+                      <div key={list.name} className={`p-4 rounded-lg ${
+                        theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
+                      }`}>
+                        <div className="flex justify-between items-center mb-2">
+                          <h4 className={`text-lg font-semibold ${
+                            theme === 'dark' ? 'text-white' : 'text-gray-900'
+                          }`}>{list.name}</h4>
+                          <div className="flex items-center space-x-2">
+                            <span className={`text-sm ${
+                              theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                            }`}>{list.blogs.length} blogs</span>
+                            <button
+                              onClick={() => handleDeleteList(list.name)}
+                              className={`p-1 rounded-full ${
+                                theme === 'dark' ? 'bg-purple-900 text-purple-200 hover:bg-purple-800' : 'bg-purple-100 text-purple-600 hover:bg-purple-200'
+                              }`}
+                            >
+                              <TrashIcon className="h-4 w-4" />
+                            </button>
                           </div>
                         </div>
-                      ))}
-                    </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {list.blogs.map((blog) => (
+                            <div key={blog.id} className={`p-2 rounded ${
+                              theme === 'dark' ? 'bg-gray-600' : 'bg-white'
+                            } flex justify-between items-center`}>
+                              <div>
+                                <h5 className={`text-sm font-medium ${
+                                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                                }`}>{blog.title}</h5>
+                                <p className={`text-xs ${
+                                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                                }`}>{blog.readTime}</p>
+                              </div>
+                              <button
+                                onClick={() => handleDeleteBlog(list.name, blog.id)}
+                                className={`p-1 rounded-full ${
+                                  theme === 'dark' ? 'bg-purple-900 text-purple-200 hover:bg-purple-800' : 'bg-purple-100 text-purple-600 hover:bg-purple-200'
+                                }`}
+                              >
+                                <XIcon className="h-4 w-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
-              <div className={`px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse ${
-                theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
-              }`}>
-                <button
-                  type="button"
-                  className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 ${
-                    theme === 'dark'
-                      ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                      : 'bg-purple-600 text-white hover:bg-purple-700'
-                  } text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:ml-3 sm:w-auto sm:text-sm`}
-                  onClick={() => setShowMyListsModal(false)}
-                >
-                  Close
-                </button>
-              </div>
+            </div>
+            <div className={`px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse ${
+              theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+            }`}>
+              <button
+                type="button"
+                className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 ${
+                  theme === 'dark'
+                    ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                    : 'bg-purple-600 text-white hover:bg-purple-700'
+                } text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:ml-3 sm:w-auto sm:text-sm`}
+                onClick={() => setShowMyListsModal(false)}
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
+      </div>
       )}
 
       {/* Delete List Confirmation Modal */}
