@@ -665,7 +665,7 @@ export default function Dashboard() {
 
       {/* My Lists modal */}
       {showMyListsModal && (
-      <div className="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+       <div className="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div className="flex items-center justify-center min-h-screen p-4 text-center sm:block sm:p-0">
           <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
           <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
@@ -682,19 +682,19 @@ export default function Dashboard() {
                   }`} id="modal-title">
                     My Lists
                   </h3>
-                  <div className="mb-4 flex">
+                  <div className="mb-4 flex flex-col sm:flex-row">
                     <input
                       type="text"
                       placeholder="Enter new list name"
                       value={newListName}
                       onChange={(e) => setNewListName(e.target.value)}
-                      className={`flex-grow px-3 py-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                      className={`flex-grow px-3 py-2 border rounded-md sm:rounded-r-none mb-2 sm:mb-0 focus:outline-none focus:ring-2 focus:ring-purple-500 h-10 ${
                         theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'
                       }`}
                     />
                     <button
                       onClick={createNewList}
-                      className={`inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-r-md shadow-sm text-sm font-medium ${
+                      className={`inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md sm:rounded-l-none shadow-sm text-sm font-medium h-10 ${
                         theme === 'dark'
                           ? 'bg-purple-600 hover:bg-purple-700 text-white'
                           : 'bg-purple-600 text-white hover:bg-purple-700'
@@ -774,7 +774,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </div>
+      </div> 
       )}
 
       {/* Delete List Confirmation Modal */}
