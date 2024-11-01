@@ -178,7 +178,13 @@ export default function Dashboard() {
   const [showDeleteListConfirmation, setShowDeleteListConfirmation] = useState(false)
   const [listToDelete, setListToDelete] = useState(null)
   const [showDeleteBlogConfirmation, setShowDeleteBlogConfirmation] = useState(false)
-  const [blogToDelete, setBlogToDelete] = useState(null)
+  const [blogToDelete, setBlogToDelete] = useState(null);
+  const [showComingSoon, setShowComingSoon] = useState(false)
+
+  const handleAISummaryClick = () => {
+    setShowComingSoon(true)
+    setTimeout(() => setShowComingSoon(false), 2000) // Hide after 3 seconds
+  }
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') || 'light'
@@ -461,9 +467,85 @@ export default function Dashboard() {
               toggleUpvote={toggleUpvote}
               toggleSave={() => toggleSave(blog.id)}
               theme={theme}
+              handleAISummaryClick={handleAISummaryClick}
             />
           ))}
         </div>
+        {showComingSoon && (
+        <div className="overlay">
+          <div className="card">
+            <img src="https://images.unsplash.com/photo-1614332287897-cdc485fa562d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="AI Theme" className="ai-image" />
+          </div>
+        </div>
+      )}
+      <style jsx>{`
+        .toggle-button {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          padding: 10px 20px;
+          font-size: 16px;
+          background: #9575cd;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+
+        .overlay {
+          position: fixed;
+          inset: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: rgba(0, 0, 0, 0.7);
+          animation: slide-in 0.5s forwards;
+          animation-fill-mode: forwards;
+        }
+
+        .card {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
+          padding: 20px 40px;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+          text-align: center;
+          transition: all 0.5s ease;
+        }
+
+        .ai-image {
+          width: 200px;
+          height: auto;
+          border-radius: 8px;
+        }
+
+        @keyframes slide-in {
+          from {
+            transform: translateY(-100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes slide-out {
+          from {
+            transform: translateY(0);
+            opacity: 1;
+          }
+          to {
+            transform: translateY(-100%);
+            opacity: 0;
+          }
+        }
+
+        /* Apply slide-out animation on component unmount */
+        .overlay-exit {
+          animation: slide-out 0.5s forwards;
+        }
+      `}</style>
+
 
         {/* Pagination */}
         {activeSection !== 'Trending' && (
@@ -504,81 +586,77 @@ export default function Dashboard() {
 
       {/* Companies modal */}
       {showCompanies && (
-        <div className="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          <div className="flex items-center justify-center min-h-screen px-4 py-6 sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-            <div className={`relative inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full ${
-              theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-            }`}>
-              <div className={`px-4 pt-5 pb-4 sm:p-6 ${
-                theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-              }`}>
-                <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                    <h3 className={`text-lg leading-6 font-medium mb-4 ${
-                      theme === 'dark' ? 'text-white' : 'text-gray-900'
-                    }`} id="modal-title">
-                      Select a Company
-                    </h3>
-                    <div 
-                      className="mt-2 max-h-[60vh] overflow-y-auto pr-2"
-                      style={{
-                        scrollbarWidth: 'thin',
-                        scrollbarColor: theme === 'dark' ? '#4a5568 #2d3748' : '#cbd5e0 #edf2f7',
-                      }}
-                    >
-                      {Object.entries(groupedCompanies).map(([letter, companies]) => (
-                        <div key={letter} className="mb-4">
-                          <h4 className={`text-2xl font-bold mb-2 sticky top-0 z-10 py-1 ${
-                            theme === 'dark' ? 'text-gray-300 bg-gray-800' : 'text-gray-600 bg-white'
-                          }`}>
-                            {letter}
-                          </h4>
-                          {companies.map((company) => (
-                            <button
-                              key={company}
-                              onClick={() => setSelectedCompany(company)}
-                              className={`w-full text-left px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                                selectedCompany === company
-                                  ? theme === 'dark'
-                                    ? 'bg-purple-700 text-white'
-                                    : 'bg-purple-100 text-purple-900'
-                                  : theme === 'dark'
-                                  ? 'text-gray-300 hover:bg-gray-700'
-                                  : 'text-gray-700 hover:bg-gray-100'
-                              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500`}
-                            >
-                              {company}
-                            </button>
-                          ))}
-                        </div>
-                      ))}
-                    </div>
+        <div 
+        className="fixed z-50 inset-0 overflow-y-auto flex items-center justify-center p-4 sm:p-0" 
+        aria-labelledby="modal-title" 
+        role="dialog" 
+        aria-modal="true" 
+        onClick={() => setShowCompanies(false)}
+        >
+        <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" aria-hidden="true"></div>
+        <div 
+          className={`relative rounded-lg shadow-xl transform transition-all w-full sm:max-w-4xl h-full sm:h-auto sm:max-h-[90vh] flex flex-col ${
+            theme === 'dark' 
+              ? 'bg-gray-800 text-white' 
+              : 'bg-white text-gray-900'
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className={`px-4 sm:px-6 py-4 border-b ${
+            theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+          }`}>
+            <h3 className="text-xl sm:text-2xl font-semibold" id="modal-title">
+              Select a Company
+            </h3>
+            <button
+              onClick={() => setShowCompanies(false)}
+              className={`absolute top-4 right-4 p-2 rounded-full transition-colors duration-200 ${
+                theme === 'dark'
+                  ? 'text-gray-400 hover:text-white hover:bg-gray-700'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              <XIcon className="h-6 w-6" />
+            </button>
+          </div>
+          <div className="flex-grow overflow-y-auto p-4 sm:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+              {Object.entries(groupedCompanies).map(([letter, companies]) => (
+                <div key={letter} className="space-y-2">
+                  <h4 className={`text-lg sm:text-xl font-bold sticky top-0 z-10 py-1 ${
+                    theme === 'dark' 
+                      ? 'text-purple-300 bg-gray-800' 
+                      : 'text-purple-600 bg-white'
+                  }`}>
+                    {letter}
+                  </h4>
+                  <div className="space-y-1">
+                    {companies.map((company) => (
+                      <button
+                        key={company}
+                        onClick={() => setSelectedCompany(company)}
+                        className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all duration-200 flex items-center justify-between ${
+                          selectedCompany === company
+                            ? theme === 'dark'
+                              ? 'bg-purple-700 text-white'
+                              : 'bg-purple-100 text-purple-900'
+                            : theme === 'dark'
+                            ? 'text-gray-300 hover:bg-gray-700'
+                            : 'text-gray-700 hover:bg-gray-100'
+                        } focus:outline-none focus:ring-2 focus:ring-purple-500`}
+                      >
+                        <span className="truncate">{company}</span>
+                        {selectedCompany === company && (
+                          <CheckIcon className="h-5 w-5 flex-shrink-0 ml-2" />
+                        )}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              </div>
-              <div className={`px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse ${
-                theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
-              }`}>
-                <button
-                  type="button"
-                  className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 ${
-                    theme === 'dark'
-                      ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                      : 'bg-purple-600 text-white hover:bg-purple-700'
-                  } text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:ml-3 sm:w-auto sm:text-sm`}
-                  onClick={() => {
-                    if (selectedCompany) {
-                      toast.success(`Selected ${selectedCompany}`)
-                    }
-                    setShowCompanies(false)
-                  }}
-                >
-                  Close
-                </button>
-              </div>
+              ))}
             </div>
           </div>
+        </div>
         </div>
       )}
 
@@ -665,13 +743,13 @@ export default function Dashboard() {
 
       {/* My Lists modal */}
       {showMyListsModal && (
-       <div className="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div className="fixed z-50 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true" onClick={() => setShowMyListsModal(false)}>
         <div className="flex items-center justify-center min-h-screen p-4 text-center sm:block sm:p-0">
           <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
           <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
           <div className={`inline-block align-middle rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-xl sm:w-full ${
             theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-          }`}>
+          }`} onClick={(e) => e.stopPropagation()}>
             <div className={`px-4 pt-5 pb-4 sm:p-6 sm:pb-4 ${
               theme === 'dark' ? 'bg-gray-800' : 'bg-white'
             }`}>
@@ -682,6 +760,14 @@ export default function Dashboard() {
                   }`} id="modal-title">
                     My Lists
                   </h3>
+                  <button
+                    onClick={() => setShowMyListsModal(false)}
+                    className={`absolute top-3 right-3 p-2 rounded-full ${
+                      theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-700'
+                    } focus:outline-none`}
+                  >
+                    <XIcon className="h-6 w-6" />
+                  </button>
                   <div className="mb-4 flex flex-col sm:flex-row">
                     <input
                       type="text"
@@ -757,24 +843,9 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-            <div className={`px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse ${
-              theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
-            }`}>
-              <button
-                type="button"
-                className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 ${
-                  theme === 'dark'
-                    ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                    : 'bg-purple-600 text-white hover:bg-purple-700'
-                } text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:ml-3 sm:w-auto sm:text-sm`}
-                onClick={() => setShowMyListsModal(false)}
-              >
-                Close
-              </button>
-            </div>
           </div>
         </div>
-      </div> 
+      </div>
       )}
 
       {/* Delete List Confirmation Modal */}
@@ -910,10 +981,10 @@ const NavItem = ({ icon, text, active, onClick, mobile, theme }) => (
   </button>
 )
 
-const BlogCard = ({ blog, toggleUpvote, toggleSave, theme }) => (
+const BlogCard = ({ blog, toggleUpvote, toggleSave, theme, handleAISummaryClick }) => (
   <div className={`${
     theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-  } overflow-hidden shadow-lg rounded-lg transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 h-full flex flex-col`}>
+  } overflow-hidden shadow-lg rounded-lg transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 h-full flex flex-col relative`}>
     <img className="h-48 w-full object-cover" src={blog.image} alt={blog.title} />
     <div className="p-4 flex-grow flex flex-col">
       <div className="flex justify-between items-center mb-2">
@@ -958,9 +1029,12 @@ const BlogCard = ({ blog, toggleUpvote, toggleSave, theme }) => (
             <BookmarkIcon className="h-4 w-4" />
           </button>
         </div>
-        <button className={`flex items-center text-sm ${
-          theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-700'
-        }`}>
+        <button 
+          onClick={handleAISummaryClick}
+          className={`flex items-center text-sm ${
+            theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-700'
+          }`}
+        >
           <ZapIcon className="h-4 w-4 mr-1" />
           AI Summary
         </button>
