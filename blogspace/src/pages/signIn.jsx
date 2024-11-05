@@ -18,7 +18,7 @@ export default function SignIn() {
     setSignInError(null)
     try {
       console.log(email + "" + password);
-      const response = await fetch('http://localhost:3030/api/v1/user/login', {
+      const response = await fetch('https://blogspace-dun.vercel.app/api/v1/user/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
