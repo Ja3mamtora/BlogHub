@@ -6,7 +6,7 @@ import { debounce, throttle } from 'lodash'
 import { HomeIcon, ListIcon, FlameIcon, BuildingIcon, ArrowUpIcon, BookmarkIcon, SearchIcon, XIcon, ZapIcon, FilterIcon, PlusIcon, SunIcon, MoonIcon, LogOutIcon, TrashIcon } from 'lucide-react'
 import { Toaster, toast } from 'react-hot-toast'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api'
+const API_BASE_URL = 'https://blogspace-dun.vercel.app/api/v1/user'
 const token = localStorage.getItem('token');
 
 const axiosInstance = axios.create({
