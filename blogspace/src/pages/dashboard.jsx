@@ -7,11 +7,13 @@ import { HomeIcon, ListIcon, FlameIcon, BuildingIcon, ArrowUpIcon, BookmarkIcon,
 import { Toaster, toast } from 'react-hot-toast'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api'
+const token = localStorage.getItem('token');
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
   },
 })
 
@@ -62,8 +64,8 @@ export default function Dashboard() {
       const response = await axiosInstance.get('/blogs', {
         params: { page, limit: 8, category: selectedCategory !== 'All' ? selectedCategory : undefined }
       })
-      setBlogs(response.data.data)
-      setTotalPages(response.data.totalPages)
+      setBlogs(response.data.data.data.blogs)
+      setTotalPages(response.data.data.data.totalPages)
       setCurrentPage(page)
     } catch (error) {
       console.error('Error fetching blogs:', error)
