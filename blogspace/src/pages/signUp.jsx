@@ -43,7 +43,7 @@ export default function SignUp() {
 
     try {
       setIsSubmitting(true);    
-      const response = await fetch('http://localhost:3030/api/v1/user/register', {
+      const response = await fetch('https://www.blog-space.me/api/v1/user/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
