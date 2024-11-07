@@ -928,7 +928,7 @@ const BlogCard = ({ blog, toggleUpvote, toggleSave, theme, handleAISummaryClick 
         }`}>
           {blog.topic}
         </span>
-        <span className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{blog.reading_time}</span>
+        <span className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{blog.reading_time} + " min"</span>
       </div>
       <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{blog.title}</h3>
       <p className={`text-sm mb-4 flex-grow ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>{blog.description}</p>
