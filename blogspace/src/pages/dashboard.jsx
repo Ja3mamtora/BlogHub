@@ -920,13 +920,13 @@ const BlogCard = ({ blog, toggleUpvote, toggleSave, theme, handleAISummaryClick 
   <div className={`${
     theme === 'dark' ? 'bg-gray-800' : 'bg-white'
   } overflow-hidden shadow-lg rounded-lg transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 h-full flex flex-col relative`}>
-    <img className="h-48 w-full object-cover" src={blog.image} alt={blog.title} />
+    <img className="h-48 w-full object-cover" src={blog.image_url} alt={blog.title} />
     <div className="p-4 flex-grow flex flex-col">
       <div className="flex justify-between items-center mb-2">
         <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
           theme === 'dark' ? 'bg-indigo-900 text-indigo-200' : 'bg-indigo-100 text-indigo-600'
         }`}>
-          {blog.category}
+          {blog.topic}
         </span>
         <span className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{blog.readTime}</span>
       </div>
