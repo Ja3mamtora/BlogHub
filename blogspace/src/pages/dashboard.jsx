@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import axios from 'axios'
 import { debounce, throttle } from 'lodash'
@@ -65,12 +63,12 @@ export default function Dashboard() {
         params: { page, limit: 8, category: selectedCategory !== 'All' ? selectedCategory : undefined }
       })
       setBlogs(response.data.data.data.blogs)
+      console.log(response.data.data.data.blogs)
       setTotalPages(response.data.data.data.totalPages)
       setCurrentPage(page)
     } catch (error) {
       console.error('Error fetching blogs:', error)
       toast.error('Failed to fetch blogs')
-      // Set blogs to an empty array when there's an error
       setBlogs([])
     } finally {
       setIsLoading(false)
@@ -120,20 +118,44 @@ export default function Dashboard() {
   }
 
   const throttledUpvote = useMemo(
-    () => throttle(async (blogId) => {
+    () => throttle(async (blogId, isUpvoted) => {
       try {
-        await axiosInstance.patch('/upvote', { blogId })
-        fetchBlogs(currentPage)
+        await axiosInstance.patch('/upvote', { blogId, isUpvoted })
       } catch (error) {
         console.error('Error upvoting blog:', error)
         toast.error('Failed to upvote blog')
+        // Revert the optimistic update
+        setBlogs(prevBlogs => 
+          prevBlogs.map(blog => 
+            blog.id === blogId 
+              ? { ...blog, isUpvoted: !isUpvoted, upvote_count: isUpvoted ? blog.upvote_count - 1 : blog.upvote_count + 1 } 
+              : blog
+          )
+        )
       }
-    }, 1000),
-    [fetchBlogs, currentPage]
+    }, 2000),
+    []
   )
 
   const handleUpvote = (blogId) => {
-    throttledUpvote(blogId)
+    setBlogs(prevBlogs => 
+      prevBlogs.map(blog => {
+        if (blog.id === blogId) {
+          const newIsUpvoted = !blog.isUpvoted
+          return {
+            ...blog,
+            isUpvoted: newIsUpvoted,
+            upvote_count: newIsUpvoted ? blog.upvote_count + 1 : blog.upvote_count - 1
+          }
+        }
+        return blog
+      })
+    )
+
+    const updatedBlog = blogs.find(blog => blog.id === blogId)
+    if (updatedBlog) {
+      throttledUpvote(blogId, updatedBlog.isUpvoted)
+    }
   }
 
   const handleAddToList = async (blogId, listName) => {
@@ -248,7 +270,7 @@ export default function Dashboard() {
 
   const toggleSave = (blogId) => {
     const blog = blogs.find(blog => blog.id === blogId)
-    if (blog.saved) {
+    if (blog.isBookmarked) {
       setSelectedBlogId(blogId)
       setShowDeleteBlogConfirmation(true)
     } else {
@@ -261,7 +283,7 @@ export default function Dashboard() {
     try {
       await axiosInstance.patch('/addToList', { blogId: selectedBlogId, listName })
       setBlogs(blogs.map(blog =>
-        blog.id === selectedBlogId ? { ...blog, saved: true } : blog
+        blog.id === selectedBlogId ? { ...blog, isBookmarked: true } : blog
       ))
       setShowBookmarkModal(false)
       toast.success(`Blog saved to ${listName}`)
@@ -341,7 +363,6 @@ export default function Dashboard() {
       </nav>
 
       {/* Mobile menu */}
-      
       {mobileMenuOpen && (
         <div className={`sm:hidden fixed top-16 left-0 right-0 z-40 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="pt-2 pb-3 space-y-1">
@@ -464,7 +485,7 @@ export default function Dashboard() {
               <BlogCard
                 key={blog.id}
                 blog={blog}
-                toggleUpvote={() => handleUpvote(blog.id)}
+                handleUpvote={handleUpvote}
                 toggleSave={() => toggleSave(blog.id)}
                 theme={theme}
                 handleAISummaryClick={handleAISummaryClick}
@@ -759,7 +780,7 @@ export default function Dashboard() {
                                   }`}>{blog.title}</h5>
                                   <p className={`text-xs ${
                                     theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                                  }`}>{blog.readTime}</p>
+                                  }`}>{blog.reading_time} min read</p>
                                 </div>
                                 <button
                                   onClick={() => handleDeleteBlog(list.name, blog.id)}
@@ -916,7 +937,7 @@ const NavItem = ({ icon, text, active, onClick, mobile, theme }) => (
   </button>
 )
 
-const BlogCard = ({ blog, toggleUpvote, toggleSave, theme, handleAISummaryClick }) => (
+const BlogCard = ({ blog, handleUpvote, toggleSave, theme, handleAISummaryClick }) => (
   <div className={`${
     theme === 'dark' ? 'bg-gray-800' : 'bg-white'
   } overflow-hidden shadow-lg rounded-lg transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 h-full flex flex-col relative`}>
@@ -935,24 +956,24 @@ const BlogCard = ({ blog, toggleUpvote, toggleSave, theme, handleAISummaryClick 
       <div className="flex justify-between items-center mt-auto">
         <div className="flex space-x-2">
           <button
-            onClick={toggleUpvote}
+            onClick={() => handleUpvote(blog.id)}
             className={`flex items-center space-x-1 px-2 py-1 rounded-full ${
-              blog.upvoted
+              blog.isUpvoted
                 ? theme === 'dark'
-                  ? 'bg-indigo-900 text-indigo-200'
-                  : 'bg-indigo-100 text-indigo-600'
+                  ? 'bg-purple-900 text-purple-200'
+                  : 'bg-purple-100 text-purple-600'
                 : theme === 'dark'
                 ? 'bg-gray-700 text-gray-300'
                 : 'bg-gray-200 text-gray-600'
-            }`}
+            } transition-colors duration-200`}
           >
             <ArrowUpIcon className="h-4 w-4" />
             <span>{blog.upvote_count}</span>
           </button>
           <button
-            onClick={toggleSave}
+            onClick={() => toggleSave(blog.id)}
             className={`p-1 rounded-full ${
-              blog.saved
+              blog.isBookmarked
                 ? theme === 'dark'
                   ? 'bg-yellow-900 text-yellow-200'
                   : 'bg-yellow-100 text-yellow-600'
